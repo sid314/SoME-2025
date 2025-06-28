@@ -1,11 +1,14 @@
 from manim import (
-    BLUE,
     GREEN,
+    ORANGE,
+    PURPLE,
+    RED,
+    RIGHT,
+    UP,
     Circle,
-    DrawBorderThenFill,
-    FadeOut,
-    Indicate,
-    ReplacementTransform,
+    Dot,
+    NumberPlane,
+    Point,
     Scene,
     Square,
 )
@@ -13,9 +16,14 @@ from manim import (
 
 class Test(Scene):
     def construct(self):
-        green_square = Square(color=GREEN, fill_opacity=0.5)
-        self.play(DrawBorderThenFill(green_square))
-        blue_circle = Circle(color=BLUE, fill_opacity=0.5)
-        self.play(ReplacementTransform(green_square, blue_circle))
-        self.play(Indicate(blue_circle))
-        self.play(FadeOut(blue_circle))
+        plane = NumberPlane()
+        self.add(plane)
+        # next to
+        red_dot = Dot(color=RED)
+        green_dot = Dot(color=GREEN)
+        green_dot.next_to(red_dot, RIGHT + UP)
+        self.add(red_dot, green_dot)
+        # shift
+        s = Square(color=ORANGE)
+        s.shift(2 * UP + 4 * RIGHT)
+        self.add(s)
