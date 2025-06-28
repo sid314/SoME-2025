@@ -1,16 +1,13 @@
 from manim import (
-    BLUE,
-    GREEN,
-    RIGHT,
-    Circle,
+    PINK,
+    Axes,
     Scene,
-    Square,
 )
 
 
 class Test(Scene):
     def construct(self):
-        blue_circle = Circle(color=BLUE, fill_opacity=0.5)
-        green_square = Square(color=GREEN, fill_opacity=0.5)
-        green_square.next_to(blue_circle, RIGHT)
-        self.add(blue_circle, green_square)
+        ax = Axes(x_range=(-3, 3), y_range=(-3, 3))
+        curve = ax.plot(lambda x: (x) * (x - 2) * (x + 2), color=PINK)
+        area = ax.get_area(curve, x_range=(-2, 0))
+        self.add(ax, curve, area)
