@@ -1,14 +1,11 @@
 from manim import (
     GREEN,
     ORANGE,
-    PURPLE,
     RED,
     RIGHT,
     UP,
-    Circle,
     Dot,
     NumberPlane,
-    Point,
     Scene,
     Square,
 )
