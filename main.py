@@ -208,6 +208,56 @@ class NaiveAnt(ThreeDScene):
         self.wait(5)
 
 
+class OptimalAnt(ThreeDScene):
+    def construct(self):
+        self.move_camera(50 * DEGREES)
+        self.begin_ambient_camera_rotation(-0.4)
+        axes = Axes(x_length=16, y_length=16,
+                    x_range=[-16, 16], y_range=[-16, 16])
+        self.add(axes)
+        square_base = Square(stroke_width=2)
+        square_top = square_base.copy().shift(2 * OUT)
+        square_right = (
+            square_base.copy()
+            .shift(2 * RIGHT)
+            .rotate(angle=90 * DEGREES, axis=DOWN, about_point=RIGHT)
+        )
+        square_left = (
+            square_base.copy()
+            .shift(2 * LEFT)
+            .rotate(angle=90 * DEGREES, axis=UP, about_point=LEFT)
+        )
+        square_up = (
+            square_base.copy()
+            .shift(2 * UP)
+            .rotate(angle=90 * DEGREES, axis=RIGHT, about_point=UP)
+        )
+        square_down = (
+            square_base.copy()
+            .shift(2 * DOWN)
+            .rotate(angle=90 * DEGREES, axis=LEFT, about_point=DOWN)
+        )
+        dot = Dot3D(LEFT + UP)
+        self.add(dot)
+        fade_ins = [
+            FadeIn(square_base),
+            FadeIn(square_top),
+            FadeIn(square_up),
+            FadeIn(square_left),
+            FadeIn(square_down),
+            FadeIn(square_right),
+        ]
+
+        dotPath = TracedPath(dot.get_center, stroke_color=BLUE, stroke_width=5)
+        self.add(dotPath)
+        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
+        self.play(dot.animate.move_to(DOWN))
+        self.wait(1)
+
+        self.play(dot.animate.move_to(RIGHT + DOWN + 2 * OUT))
+        self.wait(5)
+
+
 class Cube_Unfold(ThreeDScene):
     def construct(self):
         self.move_camera(50 * DEGREES)
