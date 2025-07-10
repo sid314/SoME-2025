@@ -31,7 +31,6 @@ from manim import (
     ThreeDAxes,
     ThreeDScene,
     TracedPath,
-    np,
 )
 
 
@@ -256,6 +255,69 @@ class OptimalAnt(ThreeDScene):
 
         self.play(dot.animate.move_to(RIGHT + DOWN + 2 * OUT))
         self.wait(5)
+
+
+class AntPaths(ThreeDScene):
+    def construct(self):
+        self.move_camera(50 * DEGREES)
+        self.begin_ambient_camera_rotation(-0.4)
+        Dot3D.set_default(resolution=(2, 2))
+        axes = Axes(x_length=16, y_length=16,
+                    x_range=[-16, 16], y_range=[-16, 16])
+        self.add(axes)
+        square_base = Square(stroke_width=0.5, stroke_color=ORANGE)
+        square_top = square_base.copy().shift(2 * OUT)
+        square_right = (
+            square_base.copy()
+            .shift(2 * RIGHT)
+            .rotate(angle=90 * DEGREES, axis=DOWN, about_point=RIGHT)
+        )
+        square_left = (
+            square_base.copy()
+            .shift(2 * LEFT)
+            .rotate(angle=90 * DEGREES, axis=UP, about_point=LEFT)
+        )
+        square_up = (
+            square_base.copy()
+            .shift(2 * UP)
+            .rotate(angle=90 * DEGREES, axis=RIGHT, about_point=UP)
+        )
+        square_down = (
+            square_base.copy()
+            .shift(2 * DOWN)
+            .rotate(angle=90 * DEGREES, axis=LEFT, about_point=DOWN)
+        )
+        dotlist = []
+        for _ in range(11):
+            dotlist.append(Dot(LEFT + UP, radius=0))
+        for dot in dotlist:
+            dotPath = TracedPath(
+                dot.get_center, stroke_color=BLUE, stroke_width=2)
+            self.add(dotPath)
+        first_moves = []
+        for x in range(11):
+            first_moves.append(
+                dotlist[x].animate.move_to(
+                    DOWN + ((-10 + 2 * x) / 10.0 * RIGHT))
+            )
+        fade_ins = [
+            FadeIn(square_base),
+            FadeIn(square_top),
+            FadeIn(square_up),
+            FadeIn(square_left),
+            FadeIn(square_down),
+            FadeIn(square_right),
+        ]
+
+        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
+        self.play(AnimationGroup(*first_moves, lag_ratio=0.1))
+        self.wait(1)
+        second_moves = []
+        for dot in dotlist:
+            second_moves.append(dot.animate.move_to(RIGHT + DOWN + 2 * OUT))
+        self.play(AnimationGroup(*second_moves, lag_ratio=0.1))
+
+        self.wait(2)
 
 
 class Cube_Unfold(ThreeDScene):
