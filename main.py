@@ -1,4 +1,5 @@
 from manim import (
+    BLUE,
     DARK_BLUE,
     DEGREES,
     DOWN,
@@ -8,24 +9,34 @@ from manim import (
     LEFT,
     ORANGE,
     OUT,
+    PI,
+    PINK,
     RED,
     RIGHT,
     UP,
     YELLOW,
+    AnimationGroup,
+    Axes,
     Create,
     Cube,
     Dot,
     Dot3D,
     DrawBorderThenFill,
+    FadeIn,
     FadeOut,
     NumberPlane,
     Point,
+    Rotate,
     Scene,
     Square,
     ThreeDAxes,
     ThreeDScene,
     TracedPath,
+    ValueTracker,
+    Vector,
+    np,
 )
+from manim.typing import Point3D, Vector3D
 
 
 class Test(Scene):
@@ -100,5 +111,70 @@ class AntRandom(ThreeDScene):
         self.play(dot_a.animate.move_to(corner_c))
         self.play(dot_a.animate.move_to(corner_b))
         self.play(FadeOut(dot_a, dotPath))
+
+        self.wait(5)
+
+
+class Cube_Unfold(ThreeDScene):
+    def construct(self):
+        self.move_camera(50 * DEGREES)
+        axes = Axes(x_length=16, y_length=16,
+                    x_range=[-16, 16], y_range=[-16, 16])
+        self.add(axes)
+        square_base = Square()
+        square_top = square_base.copy().shift(2 * OUT).set_color(BLUE)
+        square_right = (
+            square_base.copy()
+            .shift(2 * RIGHT)
+            .rotate(angle=90 * DEGREES, axis=DOWN, about_point=RIGHT)
+            .set_color(GREEN)
+        )
+        square_left = (
+            square_base.copy()
+            .shift(2 * LEFT)
+            .rotate(angle=90 * DEGREES, axis=UP, about_point=LEFT)
+            .set_color(RED)
+        )
+        square_up = (
+            square_base.copy()
+            .shift(2 * UP)
+            .rotate(angle=90 * DEGREES, axis=RIGHT, about_point=UP)
+            .set_color(YELLOW)
+        )
+        square_down = (
+            square_base.copy()
+            .shift(2 * DOWN)
+            .rotate(angle=90 * DEGREES, axis=LEFT, about_point=DOWN)
+            .set_color(PINK)
+        )
+        fade_ins = [
+            FadeIn(square_base),
+            FadeIn(square_top),
+            FadeIn(square_up),
+            FadeIn(square_left),
+            FadeIn(square_down),
+            FadeIn(square_right),
+        ]
+
+        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
+        self.begin_ambient_camera_rotation(0.2)
+        rotations = [
+            Rotate(square_left, angle=-90 * DEGREES,
+                   axis=UP, about_point=[-1, 0, 0]),
+            Rotate(square_right, angle=-90 * DEGREES,
+                   axis=DOWN, about_point=[1, 0, 0]),
+            Rotate(square_up, angle=-90 * DEGREES,
+                   axis=RIGHT, about_point=[0, 1, 0]),
+            Rotate(square_down, angle=-90 * DEGREES,
+                   axis=LEFT, about_point=[0, -1, 0]),
+            # square_top.animate.move_to(4 * RIGHT),
+            Rotate(square_top, angle=-90 * DEGREES,
+                   axis=DOWN, about_point=[0, 0, -1]),
+        ]
+        self.play(AnimationGroup(*rotations, lag_ratio=0.1))
+        self.play(
+            Rotate(square_top, angle=-90 * DEGREES,
+                   axis=UP, about_point=[3, 0, 0]),
+        )
 
         self.wait(5)
