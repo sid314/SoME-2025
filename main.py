@@ -25,6 +25,7 @@ from manim import (
     FadeOut,
     NumberPlane,
     Point,
+    Rectangle,
     Rotate,
     Scene,
     Square,
@@ -380,6 +381,67 @@ class Cube_Unfold(ThreeDScene):
         self.play(
             Rotate(square_top, angle=-90 * DEGREES,
                    axis=UP, about_point=[3, 0, 0]),
+        )
+
+        self.wait(5)
+
+
+class Cuboid_Unfold(ThreeDScene):
+    def construct(self):
+        a = 1.0
+        b = 1.4
+        c = 1.2
+        self.move_camera(50 * DEGREES)
+        self.camera.set_zoom(1)
+        axes = Axes(x_length=16, y_length=16,
+                    x_range=[-16, 16], y_range=[-16, 16])
+        self.add(axes)
+        base = Rectangle(width=a, height=b, stroke_width=2)
+
+        top = base.copy().shift(c * OUT).set_color(BLUE)
+
+        right = Rectangle(width=c, height=b, color=GREEN, stroke_width=2)
+        right.shift(((c + a) / 2) * RIGHT)
+        right.rotate(angle=90 * DEGREES, axis=DOWN,
+                     about_point=(a / 2) * RIGHT)
+
+        left = Rectangle(width=c, height=b, color=RED, stroke_width=2)
+        left.shift((-(c + a) / 2) * RIGHT)
+        left.rotate(angle=90 * DEGREES, axis=UP, about_point=(a / 2) * LEFT)
+
+        up = Rectangle(width=a, height=c, color=YELLOW, stroke_width=2)
+        up.shift(((c + b) / 2) * UP)
+        up.rotate(angle=90 * DEGREES, axis=RIGHT, about_point=(b / 2) * UP)
+
+        down = Rectangle(width=a, height=c, color=PINK, stroke_width=2)
+        down.shift((-(c + b) / 2) * UP)
+        down.rotate(angle=90 * DEGREES, axis=LEFT, about_point=(b / 2) * DOWN)
+        fade_ins = [
+            FadeIn(base),
+            FadeIn(top),
+            FadeIn(up),
+            FadeIn(left),
+            FadeIn(down),
+            FadeIn(right),
+        ]
+        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
+        self.begin_ambient_camera_rotation(0.2)
+        rotations = [
+            Rotate(left, angle=-90 * DEGREES, axis=UP,
+                   about_point=[-a / 2, 0, 0]),
+            Rotate(right, angle=-90 * DEGREES,
+                   axis=DOWN, about_point=[a / 2, 0, 0]),
+            Rotate(up, angle=-90 * DEGREES, axis=RIGHT,
+                   about_point=[0, b / 2, 0]),
+            Rotate(down, angle=-90 * DEGREES, axis=LEFT,
+                   about_point=[0, -b / 2, 0]),
+            Rotate(top, angle=-90 * DEGREES, axis=DOWN,
+                   about_point=[0, 0, -a / 2]),
+        ]
+        self.play(AnimationGroup(*rotations, lag_ratio=0.1))
+        self.play(
+            Rotate(top, angle=-90 * DEGREES, axis=UP,
+                   about_point=[c + (a / 2), 0, 0]),
         )
 
         self.wait(5)
