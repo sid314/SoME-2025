@@ -445,3 +445,74 @@ class Cuboid_Unfold(ThreeDScene):
         )
 
         self.wait(5)
+
+
+class Cuboid_Ant_Paths(ThreeDScene):
+    def construct(self):
+        a = 1.0
+        b = 1.4
+        c = 1.2
+        self.move_camera(50 * DEGREES)
+        self.camera.set_zoom(1.2)
+        axes = Axes(x_length=16, y_length=16,
+                    x_range=[-16, 16], y_range=[-16, 16])
+        self.add(axes)
+        base = Rectangle(width=a, height=b, stroke_width=0.5,
+                         stroke_color=ORANGE)
+
+        top = base.copy().shift(c * OUT)
+
+        right = Rectangle(width=c, height=b,
+                          stroke_width=0.5, stroke_color=ORANGE)
+        right.shift(((c + a) / 2) * RIGHT)
+        right.rotate(angle=90 * DEGREES, axis=DOWN,
+                     about_point=(a / 2) * RIGHT)
+
+        left = Rectangle(width=c, height=b, stroke_width=0.5,
+                         stroke_color=ORANGE)
+        left.shift((-(c + a) / 2) * RIGHT)
+        left.rotate(angle=90 * DEGREES, axis=UP, about_point=(a / 2) * LEFT)
+
+        up = Rectangle(width=a, height=c, stroke_width=0.5,
+                       stroke_color=ORANGE)
+        up.shift(((c + b) / 2) * UP)
+        up.rotate(angle=90 * DEGREES, axis=RIGHT, about_point=(b / 2) * UP)
+
+        down = Rectangle(width=a, height=c, stroke_width=0.5,
+                         stroke_color=ORANGE)
+        down.shift((-(c + b) / 2) * UP)
+        down.rotate(angle=90 * DEGREES, axis=LEFT, about_point=(b / 2) * DOWN)
+        fade_ins = [
+            FadeIn(base),
+            FadeIn(top),
+            FadeIn(up),
+            FadeIn(left),
+            FadeIn(down),
+            FadeIn(right),
+        ]
+        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
+        self.begin_ambient_camera_rotation(-0.5)
+
+        dotlist = []
+        for _ in range(11):
+            dotlist.append(Dot(a / 2 * LEFT + b / 2 * UP, radius=0))
+        for dot in dotlist:
+            dotPath = TracedPath(
+                dot.get_center, stroke_color=BLUE, stroke_width=2)
+            self.add(dotPath)
+
+        first_moves = []
+        for x in range(11):
+            first_moves.append(
+                dotlist[x].animate.move_to(
+                    b / 2 * DOWN + ((-10 + 2 * x) / 10.0 * RIGHT * a / 2)
+                )
+            )
+        self.play(AnimationGroup(*first_moves, lag_ratio=0.3))
+        second_moves = []
+        for dot in dotlist:
+            second_moves.append(
+                dot.animate.move_to(a / 2 * RIGHT + b / 2 * DOWN + c * OUT)
+            )
+        self.play(AnimationGroup(*second_moves, lag_ratio=0.3))
+        self.wait(1)
