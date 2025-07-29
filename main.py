@@ -1,38 +1,34 @@
 from manim import (
-    BLUE,
-    DARK_BLUE,
-    DEGREES,
-    DOWN,
-    GREEN,
-    GREY,
-    IN,
-    LEFT,
-    ORANGE,
-    OUT,
-    PI,
-    PINK,
-    RED,
-    RIGHT,
-    UL,
-    UP,
-    UR,
-    YELLOW,
     AnimationGroup,
     Axes,
+    BLUE,
     Brace,
     BraceBetweenPoints,
     Create,
     Cube,
+    DARK_BLUE,
+    DEGREES,
+    DOWN,
     Dot,
     Dot3D,
     DrawBorderThenFill,
     FadeIn,
     FadeOut,
+    GREEN,
+    GREY,
+    IN,
     Indicate,
+    LEFT,
     Line,
     MathTex,
     NumberPlane,
+    ORANGE,
+    OUT,
+    PI,
+    PINK,
     Point,
+    RED,
+    RIGHT,
     Rectangle,
     Rotate,
     Scene,
@@ -44,9 +40,13 @@ from manim import (
     TracedPath,
     Transform,
     Triangle,
+    UL,
+    UP,
+    UR,
     Unwrite,
     VGroup,
     Write,
+    YELLOW,
 )
 
 
@@ -1377,6 +1377,7 @@ class Final(ThreeDScene):
         self.play(FadeOut(tr1, a_line, x_line, l1_line))
 
         pass_point_top = ((a / 2), X - (b / 2), c)
+        up_right_top = top.get_corner(UP + RIGHT)
         a_line = Line(pass_point, pass_point_top)
         a_line.set_stroke(color=PINK, width=2)
         x_line = Line(pass_point_top, up_right_top)
@@ -1384,34 +1385,13 @@ class Final(ThreeDScene):
         l1_line = Line(pass_point, up_right_top)
         l1_line.set_stroke(color=BLUE, width=2)
         self.play(FadeIn(a_line, x_line, l1_line))
+        write_unwrite_three_d(self, "Similarly $l_2$ comes out to this")
 
-        aline_copy = a_line.copy()
-        xline_copy = x_line.copy()
-        l1line_copy = l1_line.copy()
-
-        br1 = Tex("a")
-        br1.scale(0.5)
-        br2 = Tex("x")
-        br2.scale(0.5)
-        br3 = MathTex("l_1")
-        br3.scale(0.5)
-
-        tr1 = VGroup(
-            aline_copy,
-            xline_copy,
-            l1line_copy,
-            br1,
-            br2,
-            br3,
-        )
-        self.add_fixed_in_frame_mobjects(tr1)
-        aline_copy.to_corner(UR)
-        aline_copy.shift(X * DOWN)
-        xline_copy.to_corner(UR)
-        l1line_copy.to_corner(UR)
-        br1.next_to(aline_copy, direction=DOWN)
-        br2.next_to(xline_copy)
-        br3.next_to(l1line_copy, direction=UP)
-        write_unwrite_three_d(self, "And $l_2$ comes out to this")
-
+        self.begin_3dillusion_camera_rotation()
+        tex4 = MathTex("l_2 = \\sqrt{c^2+(b-x)^2}")
+        self.add_fixed_in_frame_mobjects(tex2)
+        tex4.to_edge(RIGHT)
+        tex4.next_to(tex2, direction=DOWN)
+        self.play(FadeOut(tex3), FadeIn(tex4))
+        self.play(FadeOut(tr1, a_line, x_line, l1_line))
         self.wait(5)
