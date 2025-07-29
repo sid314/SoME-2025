@@ -2,7 +2,6 @@ from manim import (
     AnimationGroup,
     Axes,
     BLUE,
-    Brace,
     BraceBetweenPoints,
     Create,
     Cube,
@@ -39,7 +38,6 @@ from manim import (
     ThreeDScene,
     TracedPath,
     Transform,
-    Triangle,
     UL,
     UP,
     UR,
@@ -1277,10 +1275,6 @@ class Final(ThreeDScene):
             Rotate(top, angle=90 * DEGREES, axis=DOWN, about_point=[0, 0, -a / 2]),
         )
         self.play(Rotate(top, angle=90 * DEGREES, axis=UP, about_point=[-a / 2, 0, c]))
-        write_unwrite_three_d(
-            self,
-            "The geometrical derivation for l is left\\\\as an exercise to the viewer",
-        )
         write_unwrite_three_d(self, "Here we will find it out using differntiation")
         dot_radius = 0.05
 
@@ -1387,11 +1381,195 @@ class Final(ThreeDScene):
         self.play(FadeIn(a_line, x_line, l1_line))
         write_unwrite_three_d(self, "Similarly $l_2$ comes out to this")
 
-        self.begin_3dillusion_camera_rotation()
         tex4 = MathTex("l_2 = \\sqrt{c^2+(b-x)^2}")
-        self.add_fixed_in_frame_mobjects(tex2)
+        self.add_fixed_in_frame_mobjects(tex4)
         tex4.to_edge(RIGHT)
         tex4.next_to(tex2, direction=DOWN)
         self.play(FadeOut(tex3), FadeIn(tex4))
-        self.play(FadeOut(tr1, a_line, x_line, l1_line))
+        self.play(
+            FadeOut(
+                a_line,
+                x_line,
+                l1_line,
+                tex4,
+                tex2,
+                top,
+                base,
+                right,
+                left,
+                up,
+                down,
+                end_dot,
+                pass_point_dot,
+                dotPath2,
+            )
+        )
+        self.move_camera(0, -PI / 2, zoom=1.0)
+        t1 = MathTex("l")
+        t2 = MathTex("= l_1+l_2")
+        t2.next_to(t1)
+        t3 = MathTex("= \\sqrt{a^2+x^2} + \\sqrt{c^2+(b-x)^2} ")
+        t3.next_to(t2, direction=DOWN)
+        t3.shift(RIGHT * 2)
+        self.play(Write(t1), Write(t2), (Write(t3)))
+        self.play(FadeOut(t2), t1.animate.shift(2.5 * LEFT), t3.animate.move_to(t2))
+        self.play(VGroup(t1, t3).animate.shift(2 * DOWN))
+        write_unwrite(self, "Now let's differentiate l\\\\ with respect to x")
+        t4 = MathTex("\\frac{dl}{dx}")
+        t5 = MathTex("=\\frac{d}{dx}(\\sqrt{a^2+x^2} + \\sqrt{c^2+(b-x)^2})")
+        self.play(Transform(t1, t4))
+        self.play(t1.animate.shift(4 * LEFT))
+
+        self.play(Transform(t3, t5), t1.animate.shift(LEFT))
+        t6 = MathTex(
+            "= \\frac{d}{dx}(\\sqrt{a^2+x^2})+\\frac{d}{dx}(\\sqrt{c^2+(b-x)^2})"
+        )
+        self.play(Transform(t3, t6))
+        t7 = MathTex(
+            "=\\frac{2x}{2\\sqrt{a^2+x^2}} - \\frac{2(b-x)}{2\\sqrt{c^2+(b-x)^2}}"
+        )
+
+        self.play(Transform(t3, t7), t1.animate.shift(RIGHT))
+        self.play(VGroup(t3, t1).animate.shift(DOWN))
+        write_unwrite(self, "Now we set the derivative to zero")
+
+        self.play(VGroup(t3, t1).animate.shift(UP))
+        self.play(FadeOut(t1), t3.animate.shift(LEFT))
+        self.play(
+            Transform(
+                t3,
+                MathTex(
+                    "\\frac{2x}{2\\sqrt{a^2+x^2}} - \\frac{2(b-x)}{2\\sqrt{c^2+(b-x)^2}}=0"
+                ),
+            )
+        )
+        waittime = 0.5
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex(
+                    "\\frac{2x}{2\\sqrt{a^2+x^2}} = \\frac{2(b-x)}{2\\sqrt{c^2+(b-x)^2}}"
+                ),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x\\sqrt{(c^2+(b-x)^2)} = (b-x)\\sqrt{(a^2+x^2)}"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x^2(c^2+(b-x)^2) = (b-x)^2(a^2+x^2)"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex(
+                    "x^2c^2+x^2b^2+x^4-2bx^3=b^2a^2+x^2b^2+x^2a^2+x^4-2a^2bx-2bx^3",
+                ),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x^2c^2 -x^2a^2 +2a^2bx -b^2a^2 = 0"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x^2c^2 -a^2(x^2 -2bx +b^2 ) = 0"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x^2c^2 - = a^2(x^2 -2bx +b^2 )"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x^2c^2  = a^2(x - b)^2"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("xc  = \\pm a(x - b)"),
+            )
+        )
+        self.wait(waittime)
+        t1 = Tex("Think about why we used the root with the negative sign")
+        t1.to_corner(UL)
+
+        self.play(
+            Transform(
+                t3,
+                MathTex("xc  = -a(x-b)"),
+            ),
+            Write(t1),
+        )
+        self.play(Unwrite(t1))
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("xc  = -ax  +ab"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x(c+a)  = ab"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x  = \\frac{ab}{a+c}"),
+            )
+        )
+        t1 = Tex("Let's see if this works for a cube.\\\\")
+        t1.to_corner(UL)
+        self.play(Write(t1))
+        self.play(
+            Transform(
+                t3,
+                MathTex("x  = \\frac{a.a}{a+a}"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x  = \\frac{a^2}{2a}"),
+            )
+        )
+        self.wait(waittime)
+        self.play(
+            Transform(
+                t3,
+                MathTex("x  = \\frac{a}{2}"),
+            )
+        )
+        self.play(Unwrite(t1))
+
+        self.play(FadeOut(t3))
+        write_unwrite(self, "Hmmm, so far so good")
+        write_unwrite(self, "Let's verify this geometrically for a cuboid")
         self.wait(5)
