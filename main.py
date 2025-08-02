@@ -2,6 +2,7 @@ from manim import (
     AnimationGroup,
     Axes,
     BLUE,
+    Brace,
     BraceBetweenPoints,
     Create,
     Cube,
@@ -41,7 +42,6 @@ from manim import (
     UL,
     UP,
     UR,
-    TransformMatchingTex,
     Unwrite,
     VGroup,
     Write,
@@ -746,9 +746,9 @@ class Final(ThreeDScene):
         down.shift((-(c + b) / 2) * UP)
         down.rotate(angle=PI / 2, axis=LEFT, about_point=(b / 2) * DOWN)
 
-        dot_position_start = a / 2 * RIGHT + b / 2 * DOWN
+        dot_position_start = -a / 2 * RIGHT + b / 2 * DOWN
         dot_position_mid = -dot_position_start
-        dot_postition_mid_optimum = a / 2 * LEFT
+        dot_postition_mid_optimum = dot_position_mid + b / 2 * DOWN
         dot_position_end = dot_position_mid + c * OUT
         dot = Dot(dot_position_start, radius=dot_radius)
         self.add(dot)
@@ -786,6 +786,7 @@ class Final(ThreeDScene):
         down_left = base.get_corner(DOWN + LEFT)
         down_right = base.get_corner(DOWN + RIGHT)
         down_left_dummy = (-a / 2, (b / 2) - c, 0)
+        down_right_dummy = (a / 2, (b / 2) - c, 0)
         brace_a = BraceBetweenPoints(up_left, up_right, direction=UP)
         a_text = brace_a.get_tex(f"{(a * 2)} unit")
         self.play(FadeIn(a_text, brace_a))
@@ -794,13 +795,13 @@ class Final(ThreeDScene):
         b_text = brace_b.get_tex(f"{(b * 2)} unit")
         self.play(FadeIn(b_text, brace_b))
 
-        brace_c = BraceBetweenPoints(up_left, down_left_dummy, direction=LEFT)
+        brace_c = BraceBetweenPoints(down_right_dummy, up_right)
         brace_c.rotate(PI / -2, about_point=up_left, axis=RIGHT)
         c_text = brace_c.get_tex(f"{(c * 2)} unit")
         c_text.rotate(PI / 2, about_point=(-a / 2, b / 2, c / 2), axis=RIGHT)
         self.play(FadeIn(c_text, brace_c))
 
-        brace_d = BraceBetweenPoints(up_left, down_right)
+        brace_d = BraceBetweenPoints(down_left, up_right)
         d_text = brace_d.get_tex("4\\sqrt{2} unit").next_to(brace_d, direction=DOWN)
 
         self.play(
@@ -933,7 +934,7 @@ class Final(ThreeDScene):
         # ant naive different paths move
         dotlist = []
         for _ in range(11):
-            dotlist.append(Dot(a / 2 * LEFT + b / 2 * UP, radius=0))
+            dotlist.append(Dot(dot_position_start, radius=0))
         dotpaths = []
         for dot in dotlist:
             dotPath = TracedPath(
@@ -946,15 +947,13 @@ class Final(ThreeDScene):
         for x in range(11):
             first_moves.append(
                 dotlist[x].animate.move_to(
-                    b / 2 * DOWN + ((-10 + 2 * x) / 10.0 * RIGHT * a / 2)
+                    base.get_corner(UP + RIGHT) + (b * x / 10.0 * DOWN)
                 )
             )
         self.play(AnimationGroup(*first_moves, lag_ratio=0.1))
         second_moves = []
         for dot in dotlist:
-            second_moves.append(
-                dot.animate.move_to(a / 2 * RIGHT + b / 2 * DOWN + c * OUT)
-            )
+            second_moves.append(dot.animate.move_to(dot_position_end))
         self.play(AnimationGroup(*second_moves, lag_ratio=0.1))
         self.wait(2)
         self.stop_ambient_camera_rotation()
@@ -990,16 +989,16 @@ class Final(ThreeDScene):
         self.add_fixed_in_frame_mobjects(t1)
         t1.to_corner(UL)
         self.play(Write(t1))
-        # start_dot = Dot()
-        #
-        # start_dot.move_to(dot_position_start)
-        # corner_end = top.get_corner(UP + RIGHT)
-        # end_dot = Dot()
-        # end_dot.move_to(corner_end)
-        up_left_top = top.get_corner(UP + LEFT)
-        start_dot = Dot(down_left, radius=dot_radius)
-        end_dot = Dot(up_left_top, radius=dot_radius)
+        start_dot = Dot()
+
+        start_dot.move_to(dot_position_start)
         corner_end = top.get_corner(UP + LEFT)
+        end_dot = Dot()
+        end_dot.move_to(corner_end)
+        # up_left_top = top.get_corner(UP + LEFT)
+        # start_dot = Dot(down_left, radius=dot_radius)
+        # end_dot = Dot(up_left_top, radius=dot_radius)
+        # corner_end = top.get_corner(UP + LEFT)
         self.play(FadeIn(start_dot, end_dot))
         self.play(Unwrite(t1))
         t1 = Tex("The shortest path is a straight line!")
@@ -1023,11 +1022,11 @@ class Final(ThreeDScene):
         t1.to_corner(UL)
         self.play(Write(t1))
 
-        corner_top_down_right = top.get_corner(DOWN + RIGHT)
+        corner_top_down_left = top.get_corner(DOWN + LEFT)
 
-        brace_d = BraceBetweenPoints(dot_position_start, corner_top_down_right)
+        brace_d = BraceBetweenPoints(dot_position_start, corner_top_down_left)
         d_text = brace_d.get_tex(f"{(a + c) * 2} units")
-        brace_e = BraceBetweenPoints(corner_top_down_right, corner_end)
+        brace_e = BraceBetweenPoints(corner_top_down_left, corner_end)
         e_text = brace_e.get_tex(f"{b * 2} units")
         self.play(FadeIn(brace_d, d_text, brace_e, e_text))
         self.play(
@@ -1136,10 +1135,10 @@ class Final(ThreeDScene):
         )
         self.move_camera(0, -PI / 2)
 
-        t1 = Tex("But what if the ant had to go across a rectangle.")
+        t1 = Tex("But what if the ant had to go across a cuboid.")
         t2 = Tex("There are again many different paths").next_to(t1, direction=DOWN)
         t3 = Tex(
-            "and going through the edge of the midpoint may not be the best solution"
+            "and going through the edge of the midpoint may not be the best solution."
         ).next_to(t2, direction=DOWN)
         t4 = AnimationGroup(Write(t1), Write(t2), Write(t3), lag_ratio=0.7)
         self.play(t4)
@@ -1150,8 +1149,6 @@ class Final(ThreeDScene):
         c = 1.2
         self.move_camera(50 * DEGREES)
         self.camera.set_zoom(1.2)
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        self.add(axes)
         base = Rectangle(width=a, height=b, stroke_width=0.5, stroke_color=ORANGE)
 
         top = base.copy().shift(c * OUT)
@@ -1178,6 +1175,7 @@ class Final(ThreeDScene):
             FadeIn(left),
             FadeIn(down),
             FadeIn(right),
+            FadeIn(axes, axes_label),
         ]
         self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
         self.begin_ambient_camera_rotation(camera_speed)
@@ -1196,7 +1194,7 @@ class Final(ThreeDScene):
         for x in range(11):
             first_moves.append(
                 dotlist[x].animate.move_to(
-                    b / 2 * DOWN + ((-10 + 2 * x) / 10.0 * RIGHT * a / 2)
+                    base.get_corner(UP + RIGHT) + (b * x / 10.0 * DOWN)
                 )
             )
         self.play(AnimationGroup(*first_moves, lag_ratio=0.1))
@@ -1530,8 +1528,8 @@ class Final(ThreeDScene):
                 t3,
                 MathTex(
                     "x^2c^2+x^2b^2+x^4-2bx^3=b^2a^2+x^2b^2+x^2a^2+x^4-2a^2bx-2bx^3",
-                ),
-            )
+                ).scale(0.8),
+            ),
         )
         self.wait(waittime)
         self.play(
@@ -1791,6 +1789,7 @@ class Final(ThreeDScene):
         big_triangle = VGroup(line1b, line2b, line3b)
         self.play(FadeIn(big_triangle))
         self.play(big_triangle.animate.shift((10 * LEFT + 3 * DOWN) * 0.5))
+
         self.play(
             FadeOut(
                 base,
@@ -1815,7 +1814,22 @@ class Final(ThreeDScene):
                 dotPath,
             )
         )
+        bra = Brace(line1s)
+        brat = bra.get_tex("a")
 
+        brx = BraceBetweenPoints(line2s.get_start(), line2s.get_end())
+        brxt = brx.get_tex("x")
+
+        self.play(FadeIn(bra, brat, brx, brxt))
+
+        braplusc = Brace(line1b)
+        braplusct = braplusc.get_tex("a+c")
+
+        brb = BraceBetweenPoints(line2b.get_start(), line2b.get_end())
+
+        brbt = brb.get_tex("b")
+
+        self.play(FadeIn(braplusc, braplusct, brb, brbt))
         write_unwrite_with_edge_three_d(
             self, "Now we can equate the ratio of similar sides"
         )
@@ -1835,5 +1849,30 @@ class Final(ThreeDScene):
         ratio_part_3 = MathTex("\\frac{ab}{a+c}")
         ratio_part_3.next_to(ratio_part_2)
         ratio_stage_2 = VGroup(ratio_part_1, ratio_part_2, ratio_part_3)
-        self.play(TransformMatchingTex(ratio_stage_1, ratio_stage_2))
+        self.play(Transform(ratio_stage_1, ratio_stage_2))
+        write_unwrite_with_edge_three_d(
+            self, "This is exactly what we got through differentiation"
+        )
+        write_unwrite_with_edge_three_d(self, "But this was more straightforward")
+        self.play(
+            FadeOut(
+                small_triangle,
+                big_triangle,
+                bra,
+                brat,
+                brb,
+                brbt,
+                brx,
+                brxt,
+                braplusc,
+                braplusct,
+                ratio_stage_1,
+            )
+        )
+
+        write_unwrite(
+            self,
+            "Hmmm, thats all byeeeeeeeeeeeeeeeee",
+        )
+
         self.wait(5)
