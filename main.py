@@ -41,15 +41,67 @@ from manim import (
     UL,
     UP,
     UR,
+    TransformMatchingTex,
     Unwrite,
     VGroup,
     Write,
     YELLOW,
 )
+from manim.typing import Vector3D
 
 
 def write_unwrite(scene: Scene, text: str, wait: int = 0):
     tex = Tex(text)
+    scene.play(Write(tex))
+    if wait > 0:
+        scene.wait(wait)
+
+    scene.play(Unwrite(tex))
+
+
+def write_unwrite_with_corner_three_d(
+    scene: ThreeDScene, text: str, wait: int = 0, corner: Vector3D = UL
+):
+    tex = Tex(text)
+    scene.add_fixed_in_frame_mobjects(tex)
+    tex.to_corner(corner)
+
+    scene.play(Write(tex))
+    if wait > 0:
+        scene.wait(wait)
+    scene.play(Unwrite(tex))
+
+
+def write_unwrite_with_edge_three_d(
+    scene: ThreeDScene, text: str, wait: int = 0, edge: Vector3D = UL
+):
+    tex = Tex(text)
+    scene.add_fixed_in_frame_mobjects(tex)
+    tex.to_edge(edge)
+
+    scene.play(Write(tex))
+    if wait > 0:
+        scene.wait(wait)
+    scene.play(Unwrite(tex))
+
+
+def write_unwrite_with_corner(
+    scene: Scene, text: str, wait: int = 0, corner: Vector3D = UL
+):
+    tex = Tex(text)
+    tex.to_corner(corner)
+    scene.play(Write(tex))
+    if wait > 0:
+        scene.wait(wait)
+
+    scene.play(Unwrite(tex))
+
+
+def write_unwrite_with_edge(
+    scene: Scene, text: str, wait: int = 0, edge: Vector3D = UP
+):
+    tex = Tex(text)
+    tex.to_edge(edge)
     scene.play(Write(tex))
     if wait > 0:
         scene.wait(wait)
@@ -938,12 +990,16 @@ class Final(ThreeDScene):
         self.add_fixed_in_frame_mobjects(t1)
         t1.to_corner(UL)
         self.play(Write(t1))
-        start_dot = Dot()
-
-        start_dot.move_to(dot_position_start)
-        corner_end = top.get_corner(UP + RIGHT)
-        end_dot = Dot()
-        end_dot.move_to(corner_end)
+        # start_dot = Dot()
+        #
+        # start_dot.move_to(dot_position_start)
+        # corner_end = top.get_corner(UP + RIGHT)
+        # end_dot = Dot()
+        # end_dot.move_to(corner_end)
+        up_left_top = top.get_corner(UP + LEFT)
+        start_dot = Dot(down_left, radius=dot_radius)
+        end_dot = Dot(up_left_top, radius=dot_radius)
+        corner_end = top.get_corner(UP + LEFT)
         self.play(FadeIn(start_dot, end_dot))
         self.play(Unwrite(t1))
         t1 = Tex("The shortest path is a straight line!")
@@ -1242,7 +1298,7 @@ class Final(ThreeDScene):
             wait=2,
         )
 
-        brace_g = BraceBetweenPoints(down_right, pass_point)
+        brace_g = BraceBetweenPoints((a / 2, -b / 2, 0), (a / 2, (-b / 2) + X, 0))
         g_text = brace_g.get_tex(("l"))
         self.play(FadeIn(brace_g, g_text))
         write_unwrite_three_d(self, "Now how do we find this l?")
@@ -1402,6 +1458,7 @@ class Final(ThreeDScene):
                 end_dot,
                 pass_point_dot,
                 dotPath2,
+                dotPath1,
             )
         )
         self.move_camera(0, -PI / 2, zoom=1.0)
@@ -1572,4 +1629,211 @@ class Final(ThreeDScene):
         self.play(FadeOut(t3))
         write_unwrite(self, "Hmmm, so far so good")
         write_unwrite(self, "Let's verify this geometrically for a cuboid")
+        self.move_camera(PI / 4, -PI / 4)
+        self.move_camera(zoom=1)
+        base = Rectangle(width=a, height=b, stroke_width=0.5, stroke_color=ORANGE)
+
+        top = base.copy().shift(c * OUT)
+
+        right = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
+        right.shift(((c + a) / 2) * RIGHT)
+        right.rotate(angle=90 * DEGREES, axis=DOWN, about_point=(a / 2) * RIGHT)
+
+        left = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
+        left.shift((-(c + a) / 2) * RIGHT)
+        left.rotate(angle=90 * DEGREES, axis=UP, about_point=(a / 2) * LEFT)
+
+        up = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
+        up.shift(((c + b) / 2) * UP)
+        up.rotate(angle=90 * DEGREES, axis=RIGHT, about_point=(b / 2) * UP)
+
+        down = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
+        down.shift((-(c + b) / 2) * UP)
+        down.rotate(angle=90 * DEGREES, axis=LEFT, about_point=(b / 2) * DOWN)
+        fade_ins = [
+            FadeIn(base),
+            FadeIn(top),
+            FadeIn(up),
+            FadeIn(left),
+            FadeIn(down),
+            FadeIn(right),
+            FadeIn(axes),
+            FadeIn(axes_label),
+        ]
+        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
+
+        rotations = [
+            Rotate(left, angle=-90 * DEGREES, axis=UP, about_point=[-a / 2, 0, 0]),
+            Rotate(right, angle=-90 * DEGREES, axis=DOWN, about_point=[a / 2, 0, 0]),
+            Rotate(up, angle=-90 * DEGREES, axis=RIGHT, about_point=[0, b / 2, 0]),
+            Rotate(down, angle=-90 * DEGREES, axis=LEFT, about_point=[0, -b / 2, 0]),
+            Rotate(top, angle=-90 * DEGREES, axis=DOWN, about_point=[0, 0, -a / 2]),
+        ]
+        down_left_top = top.get_corner(DOWN + LEFT)
+        self.play(AnimationGroup(*rotations, lag_ratio=0.1))
+
+        self.play(
+            Rotate(top, angle=-90 * DEGREES, axis=UP, about_point=[c + (a / 2), 0, 0]),
+        )
+        # put this code AFTER rotations
+        up_right_top = top.get_corner(UP + RIGHT)
+        up_left_top = top.get_corner(UP + LEFT)
+        down_left = base.get_corner(DOWN + LEFT)
+        down_right = base.get_corner(DOWN + RIGHT)
+        down_left_top = top.get_corner(DOWN + LEFT)
+        # start_dot = Dot(down_left, radius=dot_radius)
+        # end_dot = Dot(up_left_top, radius=dot_radius)
+
+        start_dot = Dot(down_left, radius=0)
+        end_dot = Dot(up_left_top, radius=0)
+        down_left_dummy = (-a / 2, (b / 2) - c, 0)
+
+        X = (b * a) / (c + a)
+        # self.add(Dot(up_left_top, color=GREEN))
+        # self.add(Dot(down_left, color=YELLOW))
+        # self.add(Dot(down_right, color=PINK))
+        # self.add(Dot(down_right, color=PINK).copy().shift(UP * X).set_color(BLUE))
+        # self.add(Dot(up_right_top))
+
+        pass_point = (((-a / 2) + c), X - (b / 2), 0)
+
+        self.play(FadeIn(start_dot, end_dot))
+        # self.add(Dot(pass_point, color=BLUE, radius=dot_radius))
+        dotPath = TracedPath(start_dot.get_center, stroke_color=RED)
+        self.add(dotPath)
+
+        write_unwrite_three_d(self, "Let's keep only the relevant parts")
+        self.play(FadeOut(left, up, down))
+        self.move_camera(0, -PI / 2, zoom=1.0)
+        self.play(start_dot.animate.move_to(end_dot))
+        # self.play(FadeOut(axes, axes_label))
+        point_a = (-a / 2, -b / 2, 0)
+        point_b = (a / 2, -b / 2, 0)
+        point_c = (a / 2, (-b / 2) + X, 0)
+        point_d = ((a / 2) + c, b / 2, 0)
+        point_e = ((a / 2) + c, -b / 2, 0)
+
+        write_unwrite_with_edge(self, "Let's label the points and lengths ")
+        self.move_camera(zoom=1.7)
+
+        bra = BraceBetweenPoints(point_a, point_b)
+        brat = bra.get_tex("a")
+        brat.next_to(bra, direction=LEFT)
+
+        braplusc = BraceBetweenPoints(point_a, point_e)
+        braplusct = braplusc.get_tex("a+c")
+        braplusct.next_to(braplusc, direction=LEFT)
+
+        VGroup(braplusc, braplusct).shift(DOWN * 0.5)
+
+        brx = BraceBetweenPoints(point_b, point_c)
+        brxt = brx.get_tex("x")
+
+        brl1 = BraceBetweenPoints(point_c, point_a)
+        brl1t = brl1.get_tex("l_1")
+        brl1t.shift(DOWN * 0.2 + 0.3 * RIGHT)
+
+        brl2 = BraceBetweenPoints(point_d, point_c)
+        brl2t = brl2.get_tex("l_2")
+        brl2t.shift(DOWN * 0.2 + 0.3 * RIGHT)
+
+        brl = BraceBetweenPoints(point_d, point_a)
+        brlt = brl.get_tex("l")
+        brlt.next_to(brl)
+        brlt.shift(UP * 0.7)
+        VGroup(brl, brlt).shift(UP)
+
+        brb = BraceBetweenPoints(point_d, point_e, direction=RIGHT)
+        brbt = brb.get_tex("b")
+
+        self.play(
+            FadeIn(
+                bra,
+                brb,
+                brx,
+                brl,
+                brl1,
+                brl2,
+                brat,
+                brbt,
+                brxt,
+                brl1t,
+                brl2t,
+                brlt,
+                braplusc,
+                braplusct,
+            )
+        )
+        self.move_camera(zoom=1.2)
+        write_unwrite_with_corner_three_d(self, "We can identify two similar triangles")
+        small_triangle_stroke_width = 3
+        small_trianlge_color = PINK
+        line1s = Line(point_a, point_b)
+        line1s.set_stroke(width=small_triangle_stroke_width, color=small_trianlge_color)
+        line2s = Line(point_b, point_c)
+        line2s.set_stroke(width=small_triangle_stroke_width, color=small_trianlge_color)
+        line3s = Line(point_c, point_a)
+        line3s.set_stroke(width=small_triangle_stroke_width, color=small_trianlge_color)
+
+        small_triangle = VGroup(line1s, line2s, line3s)
+        self.play(FadeIn(small_triangle))
+        self.play(small_triangle.animate.shift((10 * LEFT + 3 * UP) * 0.5))
+
+        large_triangle_stroke_width = 3
+        large_triangle_color = BLUE
+        line1b = Line(point_a, point_e)
+        line1b.set_stroke(width=large_triangle_stroke_width, color=large_triangle_color)
+        line2b = Line(point_e, point_d)
+        line2b.set_stroke(width=large_triangle_stroke_width, color=large_triangle_color)
+        line3b = Line(point_d, point_a)
+        line3b.set_stroke(width=large_triangle_stroke_width, color=large_triangle_color)
+
+        big_triangle = VGroup(line1b, line2b, line3b)
+        self.play(FadeIn(big_triangle))
+        self.play(big_triangle.animate.shift((10 * LEFT + 3 * DOWN) * 0.5))
+        self.play(
+            FadeOut(
+                base,
+                top,
+                right,
+                bra,
+                brb,
+                brx,
+                brl,
+                brl1,
+                brl2,
+                braplusc,
+                brat,
+                brbt,
+                brxt,
+                brlt,
+                braplusct,
+                brl1t,
+                brl2t,
+                axes,
+                axes_label,
+                dotPath,
+            )
+        )
+
+        write_unwrite_with_edge_three_d(
+            self, "Now we can equate the ratio of similar sides"
+        )
+        ratio_part_1 = MathTex("\\frac{a}{a+c}")
+        ratio_part_2 = MathTex("=")
+        ratio_part_2.next_to(ratio_part_1)
+        ratio_part_3 = MathTex("\\frac{x}{b}")
+        ratio_part_3.next_to(ratio_part_2)
+
+        ratio_stage_1 = VGroup(ratio_part_1, ratio_part_2, ratio_part_3)
+        self.play(Indicate(line1s), Indicate(line1b), FadeIn(ratio_part_1))
+        self.play(FadeIn(ratio_part_2))
+        self.play(Indicate(line2s), Indicate(line2b), FadeIn(ratio_part_3))
+        ratio_part_1 = MathTex("x")
+        ratio_part_2 = MathTex("=")
+        ratio_part_2.next_to(ratio_part_1)
+        ratio_part_3 = MathTex("\\frac{ab}{a+c}")
+        ratio_part_3.next_to(ratio_part_2)
+        ratio_stage_2 = VGroup(ratio_part_1, ratio_part_2, ratio_part_3)
+        self.play(TransformMatchingTex(ratio_stage_1, ratio_stage_2))
         self.wait(5)
