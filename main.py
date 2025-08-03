@@ -1122,7 +1122,7 @@ class Final(ThreeDScene):
         self.play(
             Transform(
                 t3,
-                MathTex("x^2c^2 - = a^2(x^2 -2bx +b^2 )"),
+                MathTex("x^2c^2  = a^2(x^2 -2bx +b^2 )"),
             )
         )
         self.wait(waittime)
