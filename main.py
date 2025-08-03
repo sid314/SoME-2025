@@ -973,7 +973,6 @@ class Final(ThreeDScene):
         tex2 = MathTex("l_1 = \\sqrt{a^2+c^2}")
         self.add_fixed_in_frame_mobjects(tex2)
         tex2.to_edge(RIGHT)
-        tex2.shift(2 * DOWN + 2 * LEFT)
         write_unwrite_three_d_with_anim(
             self,
             text="Now $l_1$ comes out to this.",
