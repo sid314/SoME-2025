@@ -328,7 +328,7 @@ class Final(ThreeDScene):
         self.play(FadeOut(axes, axes_label))
         write_unwrite_with_corner_three_d(
             self,
-            "Lets measure how much you travelled \\\\ by using the Pythagoras' Theorem. ",
+            "Let's measure how much you travelled \\\\ by using the Pythagoras' Theorem. ",
         )
 
         up_right = base.get_corner(UP + RIGHT)
@@ -438,7 +438,7 @@ class Final(ThreeDScene):
 
         self.move_camera(PI / 4, -PI / 4)
         self.move_camera(zoom=0.7)
-        t1 = Tex("Lets measure again.")
+        t1 = Tex("Let's measure again.")
         self.add_fixed_in_frame_mobjects(t1)
         t1.to_corner(UL)
         self.play(FadeOut(axes), FadeOut(axes_label), Write(t1))
@@ -558,7 +558,7 @@ class Final(ThreeDScene):
         write_unwrite_with_corner_three_d(
             self, "Notice that the ant crosses the bottom edge at its midpoint."
         )
-        self.play(FadeOut(start_dot, end_dot))
+        self.play(FadeOut(start_dot, end_dot, axes, axes_label))
         corner_top_down_left = top.get_corner(DOWN + LEFT)
 
         brace_d = BraceBetweenPoints(dot_position_start, corner_top_down_left)
@@ -585,8 +585,6 @@ class Final(ThreeDScene):
                 brace_e,
                 e_text,
                 dotPath,
-                axes,
-                axes_label,
             )
         )
         self.move_camera(0, -PI / 2, zoom=1.0)
@@ -607,7 +605,7 @@ class Final(ThreeDScene):
         self.play(t4.animate.move_to(center))
         self.play(Unwrite(t4))
         write_unwrite(self, "Hmmm, better.")
-        write_unwrite(self, "Lets see this in 3D.")
+        write_unwrite(self, "Let's see this in 3D.")
         self.move_camera(PI / 4, -PI / 4)
         self.move_camera(zoom=1)
         base = Rectangle(
@@ -929,15 +927,14 @@ class Final(ThreeDScene):
         self.play(start_dot.animate.move_to(pass_point))
         self.play(FadeOut(start_dot))
 
-        tex1 = MathTex("l_1 = ?")
-        self.add_fixed_in_frame_mobjects(tex1)
-        tex1.to_edge(RIGHT)
-
         write_unwrite_three_d_with_anim(
             self,
             text="Let's call this length $l_1$.",
             animation=Indicate(dotPath1, color=yellow_bright),
         )
+        tex1 = MathTex("l_1 = ?")
+        tex1.to_edge(RIGHT)
+        self.add_fixed_in_frame_mobjects(tex1)
         self.play(FadeIn(tex1))
 
         dotPath2 = TracedPath(
@@ -947,15 +944,14 @@ class Final(ThreeDScene):
 
         self.play(pass_point_dot.animate.move_to(end_dot))
 
-        tex3 = MathTex("l_2 = ?")
-        self.add_fixed_in_frame_mobjects(tex3)
-        tex3.next_to(tex1, direction=DOWN)
-
         write_unwrite_three_d_with_anim(
             self,
             text="And this length $l_2$.",
             animation=Indicate(dotPath2, color=yellow_bright),
         )
+        tex3 = MathTex("l_2 = ?")
+        tex3.next_to(tex1, direction=DOWN)
+        self.add_fixed_in_frame_mobjects(tex3)
         self.play(FadeIn(tex3))
 
         write_unwrite_three_d(self, "We have to minimise $l_1+l_2$.")
@@ -1446,9 +1442,17 @@ class Final(ThreeDScene):
         ratio_part_3.next_to(ratio_part_2)
 
         ratio_stage_1 = VGroup(ratio_part_1, ratio_part_2, ratio_part_3)
-        self.play(Indicate(line1s), Indicate(line1b), FadeIn(ratio_part_1))
+        self.play(
+            Indicate(line1s, color=yellow_bright),
+            Indicate(line1b, color=yellow_bright),
+            FadeIn(ratio_part_1),
+        )
         self.play(FadeIn(ratio_part_2))
-        self.play(Indicate(line2s), Indicate(line2b), FadeIn(ratio_part_3))
+        self.play(
+            Indicate(line2s, color=yellow_bright),
+            Indicate(line2b, color=yellow_bright),
+            FadeIn(ratio_part_3),
+        )
         ratio_part_1 = MathTex("x")
         ratio_part_2 = MathTex("=")
         ratio_part_2.next_to(ratio_part_1)
