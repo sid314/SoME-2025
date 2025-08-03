@@ -1,3 +1,4 @@
+from typing import Any
 from manim import (
     Animation,
     AnimationGroup,
@@ -73,7 +74,7 @@ def write_unwrite_with_anim(
 
 def write_unwrite_with_corner_three_d_with_anim(
     scene: ThreeDScene,
-    animation: Animation,
+    animation: Animation | Any,
     text: str,
     wait: int = 0,
     corner: Vector3D = UL,
@@ -856,12 +857,10 @@ class Final(ThreeDScene):
         # measure mosquito
         self.move_camera(PI / 4, -PI / 4, zoom=0.7)
         self.play(FadeOut(axes, axes_label))
-        t1 = Tex(
-            "Lets measure how much you travelled \\\\ by using the Pythagoras' Theorem. "
-        ).set_stroke(width=0.5)
-        self.add_fixed_in_frame_mobjects(t1)
-        t1.to_corner(UL)
-        self.play(Write(t1))
+        write_unwrite_with_corner_three_d(
+            self,
+            "Lets measure how much you travelled \\\\ by using the Pythagoras' Theorem. ",
+        )
 
         up_right = base.get_corner(UP + RIGHT)
         up_left = base.get_corner(UP + LEFT)
@@ -903,7 +902,6 @@ class Final(ThreeDScene):
                 a_text,
                 b_text,
                 c_text,
-                t1,
             )
         )
         # mosquito measure calculation
@@ -973,7 +971,7 @@ class Final(ThreeDScene):
         t1.to_corner(UL)
         self.play(FadeOut(axes), FadeOut(axes_label), Write(t1))
         self.play(FadeIn(brace_c), FadeIn(c_text), FadeIn(brace_d), FadeIn(d_text))
-        self.wait(2)
+        self.wait(1)
         self.play(
             FadeOut(
                 base,
@@ -1041,18 +1039,11 @@ class Final(ThreeDScene):
         self.wait(2)
         self.stop_ambient_camera_rotation()
         # cube unfold first text
-        self.move_camera(PI / 4, -PI / 4)
-        self.move_camera(zoom=0.7)
-        t1 = Tex("But how do we know which is the shortest path?")
-        self.add_fixed_in_frame_mobjects(t1)
-        t1.to_corner(UL)
-        self.play(Write(t1))
-        self.play(Unwrite(t1))
-        t2 = Tex("Let's start by unfolding this cube.")
-        self.add_fixed_in_frame_mobjects(t2)
-        t2.to_corner(UL)
-        self.play(Write(t2))
-
+        self.move_camera(PI / 4, -PI / 4, zoom=0.7)
+        write_unwrite_with_corner_three_d(
+            self, "But how do we know which is the shortest path?"
+        )
+        write_unwrite_with_corner_three_d(self, "Let's start by unfolding this cube.")
         # cube unfold first move
 
         self.play(FadeOut(*dotpaths, lag_ratio=0.1))
@@ -1067,51 +1058,44 @@ class Final(ThreeDScene):
         self.play(
             Rotate(top, angle=-90 * DEGREES, axis=UP, about_point=[c + (a / 2), 0, 0]),
         )
-        self.play(Unwrite(t2))
-        t1 = Tex("Let's mark the starting and ending positions.")
-        self.add_fixed_in_frame_mobjects(t1)
-        t1.to_corner(UL)
-        self.play(Write(t1))
-        start_dot = Dot()
 
+        start_dot = Dot()
         start_dot.move_to(dot_position_start)
         corner_end = top.get_corner(UP + LEFT)
         end_dot = Dot()
         end_dot.move_to(corner_end)
-        # up_left_top = top.get_corner(UP + LEFT)
-        # start_dot = Dot(down_left, radius=dot_radius)
-        # end_dot = Dot(up_left_top, radius=dot_radius)
-        # corner_end = top.get_corner(UP + LEFT)
-        self.play(FadeIn(start_dot, end_dot))
-        self.play(Unwrite(t1))
-        t1 = Tex("The shortest path is a straight line!")
-        self.add_fixed_in_frame_mobjects(t1)
-        t1.to_corner(UL)
-        self.play(Write(t1))
-        self.play(Unwrite(t1))
-        t1 = Tex("Notice that the ant crosses the bottom edge at its midpoint.")
-        self.add_fixed_in_frame_mobjects(t1)
-        t1.to_corner(UL)
-        self.play(Write(t1))
+        write_unwrite_with_corner_three_d_with_anim(
+            self,
+            text="Let's mark the starting and ending positions.",
+            animation=FadeIn(start_dot, end_dot),
+        )
 
         dotPath = TracedPath(
             start_dot.get_center, stroke_color=BLUE, stroke_width=stroke_width_paths
         )
         self.add(dotPath)
-        self.play(start_dot.animate.move_to(end_dot))
-        self.play(FadeOut(start_dot, end_dot), Unwrite(t1))
-        t1 = Tex("Let's measure again!")
-        self.add_fixed_in_frame_mobjects(t1)
-        t1.to_corner(UL)
-        self.play(Write(t1))
-
+        write_unwrite_with_corner_three_d_with_anim(
+            self,
+            text="The shortest path is a straight line!",
+            animation=start_dot.animate.move_to(end_dot),
+        )
+        write_unwrite_with_corner_three_d(
+            self, "Notice that the ant crosses the bottom edge at its midpoint."
+        )
+        self.play(FadeOut(start_dot, end_dot))
         corner_top_down_left = top.get_corner(DOWN + LEFT)
 
         brace_d = BraceBetweenPoints(dot_position_start, corner_top_down_left)
         d_text = brace_d.get_tex(f"{(a + c) * 2} units")
         brace_e = BraceBetweenPoints(corner_top_down_left, corner_end)
         e_text = brace_e.get_tex(f"{b * 2} units")
-        self.play(FadeIn(brace_d, d_text, brace_e, e_text))
+        write_unwrite_with_corner_three_d_with_anim(
+            self,
+            text="Let's measure again!",
+            animation=FadeIn(brace_d, d_text, brace_e, e_text),
+        )
+        self.wait(1)
+
         self.play(
             FadeOut(
                 base,
@@ -1147,12 +1131,8 @@ class Final(ThreeDScene):
         self.wait(0.5)
         self.play(t4.animate.move_to(center))
         self.play(Unwrite(t4))
-        t1 = Tex("Hmmm, better.")
-        self.play(Write(t1))
-        self.play(Unwrite(t1))
-        t1 = Tex("Lets see this in 3D")
-        self.play(Write(t1))
-        self.play(FadeOut(t1))
+        write_unwrite(self, "Hmmm, better.")
+        write_unwrite(self, "Lets see this in 3D")
         self.move_camera(PI / 4, -PI / 4)
         self.move_camera(zoom=1)
         base = Rectangle(
@@ -1207,12 +1187,10 @@ class Final(ThreeDScene):
         self.play(dot.animate.move_to(dot_position_end))
         self.wait(1)
         self.move_camera(zoom=0.7)
-        t1 = Tex("Notice how it again passes through the midpoint.")
-        self.add_fixed_in_frame_mobjects(t1)
-        t1.to_corner(UL)
-        self.play(Write(t1))
+        write_unwrite_with_corner_three_d(
+            self, "Notice how it again passes through the midpoint."
+        )
         self.wait(1)
-        self.play(FadeOut(t1))
         self.play(
             FadeOut(base, top, up, down, left, right, dot, dotPath, axes, axes_label)
         )
@@ -1258,7 +1236,7 @@ class Final(ThreeDScene):
             FadeIn(left),
             FadeIn(down),
             FadeIn(right),
-            FadeIn(axes, axes_label),
+            # FadeIn(axes, axes_label),
         ]
         self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
         self.begin_ambient_camera_rotation(camera_speed)
@@ -1369,19 +1347,18 @@ class Final(ThreeDScene):
         dotPath = TracedPath(start_dot.get_center, stroke_color=RED)
         self.add(dotPath)
         self.play(start_dot.animate.move_to(end_dot))
-        self.play(FadeOut(axes, axes_label))
         write_unwrite_three_d(
             self, "Notice how again the shortest path is a staight line."
         )
-        write_unwrite_three_d(
-            self,
-            "Let's mark the distance of the point on the bottom edge \\\\ where the dot crosses it from the bottom right \\\\ corner as l.",
-            wait=2,
-        )
-
         brace_g = BraceBetweenPoints((a / 2, -b / 2, 0), (a / 2, (-b / 2) + X, 0))
         g_text = brace_g.get_tex(("l"))
-        self.play(FadeIn(brace_g, g_text))
+        write_unwrite_three_d_with_anim(
+            self,
+            text="Let's mark the distance of the point on the bottom edge \\\\ where the dot crosses it from the bottom right \\\\ corner as l.",
+            wait=2,
+            animation=FadeIn(brace_g, g_text),
+        )
+
         write_unwrite_three_d(self, "Now how do we find this l?")
 
         rotations = [
@@ -1412,7 +1389,7 @@ class Final(ThreeDScene):
             Rotate(top, angle=90 * DEGREES, axis=DOWN, about_point=[0, 0, -a / 2]),
         )
         self.play(Rotate(top, angle=90 * DEGREES, axis=UP, about_point=[-a / 2, 0, c]))
-        write_unwrite_three_d(self, "Let's try using differntiation.")
+        write_unwrite_three_d(self, "Let's try using differentiation.")
         dot_radius = 0.05
 
         pass_point = ((a / 2), X - (b / 2), 0)
@@ -1421,7 +1398,7 @@ class Final(ThreeDScene):
 
         start_dot = Dot(down_left, radius=dot_radius)
         self.add(start_dot)
-        end_dot = Dot(top.get_corner(UP + RIGHT))
+        end_dot = Dot(top.get_corner(UP + RIGHT), radius=dot_radius)
         self.add(end_dot)
 
         write_unwrite_three_d(self, "Now watch carefully how the ant moves.")
@@ -1430,32 +1407,35 @@ class Final(ThreeDScene):
         self.play(start_dot.animate.move_to(pass_point))
         self.play(FadeOut(start_dot))
 
-        write_unwrite_three_d(self, "Let's call this length $l_1$.")
-        self.play(Indicate(dotPath1))
-
         tex1 = MathTex("l_1 = ?")
         self.add_fixed_in_frame_mobjects(tex1)
         tex1.to_edge(RIGHT)
-        self.play(FadeIn(tex1))
-        dotPath2 = TracedPath(pass_point_dot.get_center, stroke_color=YELLOW)
-        self.add(dotPath2)
-        self.play(pass_point_dot.animate.move_to(end_dot))
 
-        write_unwrite_three_d(self, "And this length $l_2$.")
+        write_unwrite_three_d_with_anim(
+            self,
+            text="Let's call this length $l_1$.",
+            animation=AnimationGroup(Indicate(dotPath1), FadeIn(tex1)),
+        )
+
+        dotPath2 = TracedPath(pass_point_dot.get_center, stroke_color=GREEN)
+        self.add(dotPath2)
+
+        self.play(pass_point_dot.animate.move_to(end_dot))
 
         tex3 = MathTex("l_2 = ?")
         self.add_fixed_in_frame_mobjects(tex3)
         tex3.next_to(tex1, direction=DOWN)
-        self.play(FadeIn(tex3))
-        self.play(Indicate(dotPath2))
+
+        write_unwrite_three_d_with_anim(
+            self,
+            text="And this length $l_2$.",
+            animation=AnimationGroup(FadeIn(tex3), Indicate(dotPath2)),
+        )
+
         write_unwrite_three_d(self, "We have to minimise $l_1+l_2$.")
 
         write_unwrite_three_d(
             self, "Let's find out $l_1$ and $l_2$ in terms of the sides and l."
-        )
-        self.play(
-            tex1.animate.shift(DOWN * 2 + LEFT * 2),
-            tex3.animate.shift(DOWN * 2 + LEFT * 2),
         )
         a_line = Line(down_right, down_left)
         a_line.set_stroke(color=PINK, width=2)
@@ -1465,47 +1445,17 @@ class Final(ThreeDScene):
         l1_line.set_stroke(color=BLUE, width=2)
         self.play(FadeIn(a_line, x_line, l1_line))
 
-        aline_copy = a_line.copy()
-        xline_copy = x_line.copy()
-        l1line_copy = l1_line.copy()
-
-        br1 = Tex("a")
-        br1.scale(0.5)
-        br2 = Tex("x")
-        br2.scale(0.5)
-        br3 = MathTex("l_1")
-        br3.scale(0.5)
-
-        tr1 = VGroup(
-            aline_copy,
-            xline_copy,
-            l1line_copy,
-            br1,
-            br2,
-            br3,
-        )
-        self.add_fixed_in_frame_mobjects(tr1)
-        aline_copy.to_corner(UR)
-        aline_copy.shift(X * DOWN)
-        xline_copy.to_corner(UR)
-        l1line_copy.to_corner(UR)
-        br1.next_to(aline_copy, direction=DOWN)
-        br2.next_to(xline_copy)
-        br3.next_to(l1line_copy, direction=UP)
-
-        # self.play(FadeIn(tr1))
-
-        tr1.shift(LEFT * 2 + DOWN * 2)
-        self.play(tr1.animate.scale(1.5))
-
-        write_unwrite_three_d(self, "Now $l_1$ comes out to this.")
-
         tex2 = MathTex("l_1 = \\sqrt{a^2+c^2}")
         self.add_fixed_in_frame_mobjects(tex2)
         tex2.to_edge(RIGHT)
         tex2.shift(2 * DOWN + 2 * LEFT)
-        self.play(FadeOut(tex1), FadeIn(tex2))
-        self.play(FadeOut(tr1, a_line, x_line, l1_line))
+        write_unwrite_three_d_with_anim(
+            self,
+            text="Now $l_1$ comes out to this.",
+            animation=AnimationGroup(FadeOut(tex1), FadeIn(tex2)),
+        )
+
+        self.play(FadeOut(a_line, x_line, l1_line))
 
         pass_point_top = ((a / 2), X - (b / 2), c)
         up_right_top = top.get_corner(UP + RIGHT)
@@ -1516,13 +1466,17 @@ class Final(ThreeDScene):
         l1_line = Line(pass_point, up_right_top)
         l1_line.set_stroke(color=BLUE, width=2)
         self.play(FadeIn(a_line, x_line, l1_line))
-        write_unwrite_three_d(self, "Similarly $l_2$ comes out to this.")
-
         tex4 = MathTex("l_2 = \\sqrt{c^2+(b-x)^2}")
         self.add_fixed_in_frame_mobjects(tex4)
         tex4.to_edge(RIGHT)
         tex4.next_to(tex2, direction=DOWN)
-        self.play(FadeOut(tex3), FadeIn(tex4))
+        write_unwrite_three_d_with_anim(
+            self,
+            text="Similarly $l_2$ comes out to this.",
+            animation=AnimationGroup(FadeOut(tex3), FadeIn(tex4)),
+        )
+        self.wait(1)
+
         self.play(
             FadeOut(
                 a_line,
@@ -1650,17 +1604,16 @@ class Final(ThreeDScene):
             )
         )
         self.wait(waittime)
-        t1 = Tex("Think about why we used the root with the negative sign.")
-        t1.to_corner(UL)
-
-        self.play(
-            Transform(
-                t3,
-                MathTex("xc  = -a(x-b)"),
+        write_unwrite_with_corner_with_anim(
+            self,
+            text="Think about why we used the root with the negative sign.",
+            animation=AnimationGroup(
+                Transform(
+                    t3,
+                    MathTex("xc  = -a(x-b)"),
+                ),
             ),
-            Write(t1),
         )
-        self.play(Unwrite(t1))
         self.wait(waittime)
         self.play(
             Transform(
