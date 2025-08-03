@@ -3,51 +3,34 @@ from manim import (
     Animation,
     AnimationGroup,
     Axes,
-    BLUE,
     Brace,
     BraceBetweenPoints,
-    Create,
-    Cube,
-    DARK_BLUE,
     DEGREES,
     DOWN,
     Dot,
-    Dot3D,
-    DrawBorderThenFill,
     FadeIn,
     FadeOut,
-    GREEN,
-    GREY,
-    IN,
     Indicate,
     LEFT,
     Line,
+    ManimColor,
     MathTex,
-    NumberPlane,
-    ORANGE,
     OUT,
     PI,
-    PINK,
-    Point,
-    RED,
     RIGHT,
     Rectangle,
     Rotate,
     Scene,
-    Square,
     Tex,
-    Text,
-    ThreeDAxes,
     ThreeDScene,
     TracedPath,
     Transform,
     UL,
     UP,
-    UR,
     Unwrite,
     VGroup,
     Write,
-    YELLOW,
+    config,
 )
 from manim.typing import Vector3D
 
@@ -212,565 +195,35 @@ def unwrite(scene: Scene, tex: Tex):
     scene.play(Write(tex))
 
 
-class Test(Scene):
-    def construct(self):
-        plane = NumberPlane()
-        self.add(plane)
-        # next to
-        red_dot = Dot(color=RED)
-        green_dot = Dot(color=GREEN)
-        green_dot.next_to(red_dot, RIGHT + UP)
-        self.add(red_dot, green_dot)
-        # shift
-        s = Square(color=ORANGE)
-        s.shift(2 * UP + 4 * RIGHT)
-        self.add(s)
-
-
-class MosquitoCube(ThreeDScene):
-    def construct(self):
-        self.set_camera_orientation(phi=75 * DEGREES, theta=90 * DEGREES)
-        axes = ThreeDAxes()
-
-        self.begin_ambient_camera_rotation(rate=0.1)
-        self.add(axes)
-
-        cube = Cube(fill_opacity=0.25, stroke_width=1.0, side_length=4)
-        self.play(DrawBorderThenFill(cube))
-        self.stop_ambient_camera_rotation()
-        self.wait(1)
-        dot_a = Dot3D(color=DARK_BLUE, radius=0.045)
-        corner_b = Point((DOWN + RIGHT + OUT) * cube.side_length / 2)
-        corner_a = Point((UP + LEFT + IN) * cube.side_length / 2)
-        dot_a.move_to(corner_a)
-        self.play(Create(dot_a))
-        dotPath = TracedPath(dot_a.get_center, stroke_color=RED)
-        self.add(dotPath)
-        self.play(dot_a.animate.move_to(corner_b))
-        self.play(FadeOut(dot_a, dotPath))
-
-        self.wait(5)
-
-
-class AntRandom(ThreeDScene):
-    def construct(self):
-        axis_length = 10
-        self.set_camera_orientation(phi=60 * DEGREES, theta=30 * DEGREES)
-        axes = ThreeDAxes(x_length=axis_length, y_length=axis_length, z_length=7)
-        label = axes.get_axis_labels(x_label="x", y_label="y", z_label="z")
-        self.add(label)
-
-        self.begin_ambient_camera_rotation(rate=0.1)
-        self.add(axes)
-
-        cube = Cube(fill_opacity=0.5, stroke_width=1.0, side_length=4)
-        self.play(DrawBorderThenFill(cube))
-        self.add(cube)
-        self.stop_ambient_camera_rotation()
-        self.wait(1)
-        # Down and up -y axis
-        # Left Right -x axis
-        # In out -z axis
-        y = 0.5
-        dot_a = Dot3D(color=GREEN, radius=0.045)
-        corner_b = Point((DOWN + RIGHT + OUT) * cube.side_length / 2)
-        corner_c = Point((RIGHT + y * UP + IN) * cube.side_length / 2)
-        corner_a = Point((UP + LEFT + IN) * cube.side_length / 2)
-        dot_a.move_to(corner_a)
-        self.play(Create(dot_a))
-        dotPath = TracedPath(dot_a.get_center, stroke_color=GREY)
-        self.add(dotPath)
-        self.play(dot_a.animate.move_to(corner_c))
-        self.play(dot_a.animate.move_to(corner_b))
-        self.play(FadeOut(dot_a, dotPath))
-
-        self.wait(5)
-
-
-class MosquitoTwo(ThreeDScene):
-    def construct(self):
-        self.move_camera(50 * DEGREES)
-        self.begin_ambient_camera_rotation(-0.4)
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        self.add(axes)
-        square_base = Square()
-        square_top = square_base.copy().shift(2 * OUT)
-        square_right = (
-            square_base.copy()
-            .shift(2 * RIGHT)
-            .rotate(angle=90 * DEGREES, axis=DOWN, about_point=RIGHT)
-        )
-        square_left = (
-            square_base.copy()
-            .shift(2 * LEFT)
-            .rotate(angle=90 * DEGREES, axis=UP, about_point=LEFT)
-        )
-        square_up = (
-            square_base.copy()
-            .shift(2 * UP)
-            .rotate(angle=90 * DEGREES, axis=RIGHT, about_point=UP)
-        )
-        square_down = (
-            square_base.copy()
-            .shift(2 * DOWN)
-            .rotate(angle=90 * DEGREES, axis=LEFT, about_point=DOWN)
-        )
-        dot = Dot3D(LEFT + UP)
-        self.add(dot)
-        fade_ins = [
-            FadeIn(square_base),
-            FadeIn(square_top),
-            FadeIn(square_up),
-            FadeIn(square_left),
-            FadeIn(square_down),
-            FadeIn(square_right),
-        ]
-
-        dotPath = TracedPath(dot.get_center, stroke_color=BLUE, stroke_width=5)
-        self.add(dotPath)
-        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
-        self.play(dot.animate.move_to(RIGHT + DOWN + 2 * OUT))
-        self.wait(5)
-
-
-class NaiveAnt(ThreeDScene):
-    def construct(self):
-        self.move_camera(50 * DEGREES)
-        self.begin_ambient_camera_rotation(-0.4)
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        self.add(axes)
-        square_base = Square(stroke_width=2)
-        square_top = square_base.copy().shift(2 * OUT)
-        square_right = (
-            square_base.copy()
-            .shift(2 * RIGHT)
-            .rotate(angle=90 * DEGREES, axis=DOWN, about_point=RIGHT)
-        )
-        square_left = (
-            square_base.copy()
-            .shift(2 * LEFT)
-            .rotate(angle=90 * DEGREES, axis=UP, about_point=LEFT)
-        )
-        square_up = (
-            square_base.copy()
-            .shift(2 * UP)
-            .rotate(angle=90 * DEGREES, axis=RIGHT, about_point=UP)
-        )
-        square_down = (
-            square_base.copy()
-            .shift(2 * DOWN)
-            .rotate(angle=90 * DEGREES, axis=LEFT, about_point=DOWN)
-        )
-        dot = Dot3D(LEFT + UP)
-        self.add(dot)
-        fade_ins = [
-            FadeIn(square_base),
-            FadeIn(square_top),
-            FadeIn(square_up),
-            FadeIn(square_left),
-            FadeIn(square_down),
-            FadeIn(square_right),
-        ]
-
-        dotPath = TracedPath(dot.get_center, stroke_color=BLUE, stroke_width=5)
-        self.add(dotPath)
-        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
-        self.play(dot.animate.move_to(RIGHT + DOWN))
-        self.wait(1)
-
-        self.play(dot.animate.move_to(RIGHT + DOWN + 2 * OUT))
-        self.wait(5)
-
-
-class OptimalAnt(ThreeDScene):
-    def construct(self):
-        self.move_camera(50 * DEGREES)
-        self.begin_ambient_camera_rotation(-0.4)
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        self.add(axes)
-        square_base = Square(stroke_width=2)
-        square_top = square_base.copy().shift(2 * OUT)
-        square_right = (
-            square_base.copy()
-            .shift(2 * RIGHT)
-            .rotate(angle=90 * DEGREES, axis=DOWN, about_point=RIGHT)
-        )
-        square_left = (
-            square_base.copy()
-            .shift(2 * LEFT)
-            .rotate(angle=90 * DEGREES, axis=UP, about_point=LEFT)
-        )
-        square_up = (
-            square_base.copy()
-            .shift(2 * UP)
-            .rotate(angle=90 * DEGREES, axis=RIGHT, about_point=UP)
-        )
-        square_down = (
-            square_base.copy()
-            .shift(2 * DOWN)
-            .rotate(angle=90 * DEGREES, axis=LEFT, about_point=DOWN)
-        )
-        dot = Dot3D(LEFT + UP)
-        self.add(dot)
-        fade_ins = [
-            FadeIn(square_base),
-            FadeIn(square_top),
-            FadeIn(square_up),
-            FadeIn(square_left),
-            FadeIn(square_down),
-            FadeIn(square_right),
-        ]
-
-        dotPath = TracedPath(dot.get_center, stroke_color=BLUE, stroke_width=5)
-        self.add(dotPath)
-        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
-        self.play(dot.animate.move_to(DOWN))
-        self.wait(1)
-
-        self.play(dot.animate.move_to(RIGHT + DOWN + 2 * OUT))
-        self.wait(5)
-
-
-class AntPaths(ThreeDScene):
-    def construct(self):
-        self.move_camera(50 * DEGREES)
-        self.begin_ambient_camera_rotation(-0.4)
-        Dot3D.set_default(resolution=(2, 2))
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        self.add(axes)
-        square_base = Square(stroke_width=0.5, stroke_color=ORANGE)
-        square_top = square_base.copy().shift(2 * OUT)
-        square_right = (
-            square_base.copy()
-            .shift(2 * RIGHT)
-            .rotate(angle=90 * DEGREES, axis=DOWN, about_point=RIGHT)
-        )
-        square_left = (
-            square_base.copy()
-            .shift(2 * LEFT)
-            .rotate(angle=90 * DEGREES, axis=UP, about_point=LEFT)
-        )
-        square_up = (
-            square_base.copy()
-            .shift(2 * UP)
-            .rotate(angle=90 * DEGREES, axis=RIGHT, about_point=UP)
-        )
-        square_down = (
-            square_base.copy()
-            .shift(2 * DOWN)
-            .rotate(angle=90 * DEGREES, axis=LEFT, about_point=DOWN)
-        )
-        dotlist = []
-        for _ in range(11):
-            dotlist.append(Dot(LEFT + UP, radius=0))
-        for dot in dotlist:
-            dotPath = TracedPath(dot.get_center, stroke_color=BLUE, stroke_width=2)
-            self.add(dotPath)
-        first_moves = []
-        for x in range(11):
-            first_moves.append(
-                dotlist[x].animate.move_to(DOWN + ((-10 + 2 * x) / 10.0 * RIGHT))
-            )
-        fade_ins = [
-            FadeIn(square_base),
-            FadeIn(square_top),
-            FadeIn(square_up),
-            FadeIn(square_left),
-            FadeIn(square_down),
-            FadeIn(square_right),
-        ]
-
-        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
-        self.play(AnimationGroup(*first_moves, lag_ratio=0.1))
-        self.wait(1)
-        second_moves = []
-        for dot in dotlist:
-            second_moves.append(dot.animate.move_to(RIGHT + DOWN + 2 * OUT))
-        self.play(AnimationGroup(*second_moves, lag_ratio=0.1))
-
-        self.wait(2)
-
-
-class Cube_Unfold(ThreeDScene):
-    def construct(self):
-        self.move_camera(50 * DEGREES)
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        self.add(axes)
-        square_base = Square()
-        square_top = square_base.copy().shift(2 * OUT).set_color(BLUE)
-        square_right = (
-            square_base.copy()
-            .shift(2 * RIGHT)
-            .rotate(angle=90 * DEGREES, axis=DOWN, about_point=RIGHT)
-            .set_color(GREEN)
-        )
-        square_left = (
-            square_base.copy()
-            .shift(2 * LEFT)
-            .rotate(angle=90 * DEGREES, axis=UP, about_point=LEFT)
-            .set_color(RED)
-        )
-        square_up = (
-            square_base.copy()
-            .shift(2 * UP)
-            .rotate(angle=90 * DEGREES, axis=RIGHT, about_point=UP)
-            .set_color(YELLOW)
-        )
-        square_down = (
-            square_base.copy()
-            .shift(2 * DOWN)
-            .rotate(angle=90 * DEGREES, axis=LEFT, about_point=DOWN)
-            .set_color(PINK)
-        )
-        fade_ins = [
-            FadeIn(square_base),
-            FadeIn(square_top),
-            FadeIn(square_up),
-            FadeIn(square_left),
-            FadeIn(square_down),
-            FadeIn(square_right),
-        ]
-
-        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
-        self.begin_ambient_camera_rotation(0.2)
-        rotations = [
-            Rotate(square_left, angle=-90 * DEGREES, axis=UP, about_point=[-1, 0, 0]),
-            Rotate(square_right, angle=-90 * DEGREES, axis=DOWN, about_point=[1, 0, 0]),
-            Rotate(square_up, angle=-90 * DEGREES, axis=RIGHT, about_point=[0, 1, 0]),
-            Rotate(square_down, angle=-90 * DEGREES, axis=LEFT, about_point=[0, -1, 0]),
-            # square_top.animate.move_to(4 * RIGHT),
-            Rotate(square_top, angle=-90 * DEGREES, axis=DOWN, about_point=[0, 0, -1]),
-        ]
-        self.play(AnimationGroup(*rotations, lag_ratio=0.1))
-        self.play(
-            Rotate(square_top, angle=-90 * DEGREES, axis=UP, about_point=[3, 0, 0]),
-        )
-
-        self.wait(5)
-
-
-class Cuboid_Unfold(ThreeDScene):
-    def construct(self):
-        a = 1.0
-        b = 1.4
-        c = 1.2
-        self.move_camera(50 * DEGREES)
-        self.camera.set_zoom(1)
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        self.add(axes)
-        base = Rectangle(width=a, height=b, stroke_width=2)
-
-        top = base.copy().shift(c * OUT).set_color(BLUE)
-
-        right = Rectangle(width=c, height=b, color=GREEN, stroke_width=2)
-        right.shift(((c + a) / 2) * RIGHT)
-        right.rotate(angle=90 * DEGREES, axis=DOWN, about_point=(a / 2) * RIGHT)
-
-        left = Rectangle(width=c, height=b, color=RED, stroke_width=2)
-        left.shift((-(c + a) / 2) * RIGHT)
-        left.rotate(angle=90 * DEGREES, axis=UP, about_point=(a / 2) * LEFT)
-
-        up = Rectangle(width=a, height=c, color=YELLOW, stroke_width=2)
-        up.shift(((c + b) / 2) * UP)
-        up.rotate(angle=90 * DEGREES, axis=RIGHT, about_point=(b / 2) * UP)
-
-        down = Rectangle(width=a, height=c, color=PINK, stroke_width=2)
-        down.shift((-(c + b) / 2) * UP)
-        down.rotate(angle=90 * DEGREES, axis=LEFT, about_point=(b / 2) * DOWN)
-        fade_ins = [
-            FadeIn(base),
-            FadeIn(top),
-            FadeIn(up),
-            FadeIn(left),
-            FadeIn(down),
-            FadeIn(right),
-        ]
-        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
-        self.begin_ambient_camera_rotation(0.2)
-        rotations = [
-            Rotate(left, angle=-90 * DEGREES, axis=UP, about_point=[-a / 2, 0, 0]),
-            Rotate(right, angle=-90 * DEGREES, axis=DOWN, about_point=[a / 2, 0, 0]),
-            Rotate(up, angle=-90 * DEGREES, axis=RIGHT, about_point=[0, b / 2, 0]),
-            Rotate(down, angle=-90 * DEGREES, axis=LEFT, about_point=[0, -b / 2, 0]),
-            Rotate(top, angle=-90 * DEGREES, axis=DOWN, about_point=[0, 0, -a / 2]),
-        ]
-        self.play(AnimationGroup(*rotations, lag_ratio=0.1))
-        self.play(
-            Rotate(top, angle=-90 * DEGREES, axis=UP, about_point=[c + (a / 2), 0, 0]),
-        )
-
-        self.wait(5)
-
-
-class Cuboid_Ant_Paths(ThreeDScene):
-    def construct(self):
-        a = 1.0
-        b = 1.4
-        c = 1.2
-        self.move_camera(50 * DEGREES)
-        self.camera.set_zoom(1.2)
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        self.add(axes)
-        base = Rectangle(width=a, height=b, stroke_width=0.5, stroke_color=ORANGE)
-
-        top = base.copy().shift(c * OUT)
-
-        right = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
-        right.shift(((c + a) / 2) * RIGHT)
-        right.rotate(angle=90 * DEGREES, axis=DOWN, about_point=(a / 2) * RIGHT)
-
-        left = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
-        left.shift((-(c + a) / 2) * RIGHT)
-        left.rotate(angle=90 * DEGREES, axis=UP, about_point=(a / 2) * LEFT)
-
-        up = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
-        up.shift(((c + b) / 2) * UP)
-        up.rotate(angle=90 * DEGREES, axis=RIGHT, about_point=(b / 2) * UP)
-
-        down = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
-        down.shift((-(c + b) / 2) * UP)
-        down.rotate(angle=90 * DEGREES, axis=LEFT, about_point=(b / 2) * DOWN)
-        fade_ins = [
-            FadeIn(base),
-            FadeIn(top),
-            FadeIn(up),
-            FadeIn(left),
-            FadeIn(down),
-            FadeIn(right),
-        ]
-        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
-        self.begin_ambient_camera_rotation(-0.5)
-
-        dotlist = []
-        for _ in range(11):
-            dotlist.append(Dot(a / 2 * LEFT + b / 2 * UP, radius=0))
-        for dot in dotlist:
-            dotPath = TracedPath(dot.get_center, stroke_color=BLUE, stroke_width=2)
-            self.add(dotPath)
-
-        first_moves = []
-        for x in range(11):
-            first_moves.append(
-                dotlist[x].animate.move_to(
-                    b / 2 * DOWN + ((-10 + 2 * x) / 10.0 * RIGHT * a / 2)
-                )
-            )
-        self.play(AnimationGroup(*first_moves, lag_ratio=0.3))
-        second_moves = []
-        for dot in dotlist:
-            second_moves.append(
-                dot.animate.move_to(a / 2 * RIGHT + b / 2 * DOWN + c * OUT)
-            )
-        self.play(AnimationGroup(*second_moves, lag_ratio=0.3))
-        self.wait(1)
-
-
-class Cuboid_Ant_Paths_Optimum(ThreeDScene):
-    def construct(self):
-        a = 2.5
-        b = 3.5
-        c = 1.5
-        self.move_camera(theta=-7.13726219, phi=0.85266463)
-        # self.camera.set_zoom(0.5)
-        axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
-        axes_label = axes.get_axis_labels(x_label="x", y_label="y")
-        self.add(axes, axes_label)
-        base = Rectangle(width=a, height=b, stroke_width=0.5, stroke_color=ORANGE)
-        top = base.copy().shift(c * OUT)
-
-        right = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
-        right.shift(((c + a) / 2) * RIGHT)
-        right.rotate(angle=PI / 2, axis=DOWN, about_point=(a / 2) * RIGHT)
-
-        left = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
-        left.shift((-(c + a) / 2) * RIGHT)
-        left.rotate(angle=PI / 2, axis=UP, about_point=(a / 2) * LEFT)
-
-        up = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
-        up.shift(((c + b) / 2) * UP)
-        up.rotate(angle=PI / 2, axis=RIGHT, about_point=(b / 2) * UP)
-
-        down = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
-        down.shift((-(c + b) / 2) * UP)
-        down.rotate(angle=PI / 2, axis=LEFT, about_point=(b / 2) * DOWN)
-        # cube = VGroup(base, top, left, right, up, down)
-        fade_ins = [
-            FadeIn(base),
-            FadeIn(top),
-            FadeIn(up),
-            FadeIn(left),
-            FadeIn(down),
-            FadeIn(right),
-        ]
-        self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
-        # self.begin_ambient_camera_rotation(-0.1)
-
-        up_right = base.get_corner(UP + RIGHT)
-        up_left = base.get_corner(UP + LEFT)
-        # up_left_top = top.get_corner(UP + LEFT)
-        down_left = base.get_corner(DOWN + LEFT)
-        down_left_dummy = (-a / 2, (b / 2) - c, 0)
-
-        # self.add(Dot(up_right))
-        # self.add(Dot(up_left))
-        # self.add(Dot(up_left_top))
-        # print(c)
-        # print("side-length", Line(up_left, up_left_top).get_length())
-        # print("side-length-dummy", Line(up_left, down_left_dummy).get_length())
-        # self.add(Dot(down_left))
-        # self.add(Dot(down_left_dummy))
-
-        brace_a = BraceBetweenPoints(up_left, up_right, direction=UP)
-        a_text = brace_a.get_tex("a")
-        self.play(FadeIn(a_text, brace_a))
-
-        brace_b = BraceBetweenPoints(up_left, down_left, direction=LEFT)
-        b_text = brace_b.get_tex("b")
-        self.play(FadeIn(b_text, brace_b))
-
-        brace_c = BraceBetweenPoints(up_left, down_left_dummy, direction=LEFT)
-        brace_c.rotate(PI / -2, about_point=up_left, axis=RIGHT)
-        c_text = brace_c.get_tex("c")
-        c_text.rotate(PI / 2, about_point=(-a / 2, b / 2, c / 2), axis=RIGHT)
-        self.play(FadeIn(c_text, brace_c))
-
-        # braces_and_text = VGroup(brace_a, brace_b, brace_c, a_text, b_text, c_text)
-
-        dotlist = []
-        for _ in range(11):
-            dotlist.append(Dot(a / 2 * LEFT + b / 2 * UP, radius=0))
-        dotpaths = []
-        for dot in dotlist:
-            dotPath = TracedPath(dot.get_center, stroke_color=BLUE, stroke_width=2)
-            dotpaths.append(dotPath)
-            self.add(dotPath)
-
-        first_moves = []
-        for x in range(11):
-            first_moves.append(
-                dotlist[x].animate.move_to(
-                    b / 2 * DOWN + ((-10 + 2 * x) / 10.0 * RIGHT * a / 2)
-                )
-            )
-        self.play(AnimationGroup(*first_moves, lag_ratio=0.1))
-        second_moves = []
-        for dot in dotlist:
-            second_moves.append(
-                dot.animate.move_to(a / 2 * RIGHT + b / 2 * DOWN + c * OUT)
-            )
-        self.play(AnimationGroup(*second_moves, lag_ratio=0.1))
-        self.interactive_embed()
-        # self.play(FadeOut(braces_and_text))
-        # self.play(FadeOut(*dotpaths, lag_ratio=0.1))
-        # self.play(FadeOut(cube))
-        self.wait(1)
-
-
 class Final(ThreeDScene):
     def construct(self):
+        background = "#090E13"
+        # foreground = "#C5C9C7"
+        # black = "#090E13"
+        red = "#c4746e"
+        green = "#8a9a7b"
+        # yellow = "#c4b28a"
+        # blue = "#8ba4b0"
+        magenta = "#a292a3"
+        # cyan = "#8ea4a2"
+        white = "#c8c093"
+        # black_bright = "#A4A7A4"
+        red_bright = "#e46876"
+        green_bright = "#87a987"
+        yellow_bright = "#e6c384"
+        blue_bright = "#7fb4ca"
+        # magenta_bright = "#938aa9"
+        cyan_bright = "#7aa89f"
+        # white_bright = "#C5C9C7"
+        config.background_color = background
+        text_color = ManimColor.from_hex(white)
+        Tex.set_default(color=text_color)
+        MathTex.set_default(color=text_color)
+        Axes.set_default(color=text_color)
+        Brace.set_default(color=text_color)
         camera_speed = -0.2
-        stroke_width_shapes = 0.5
-        stroke_width_paths = 2
+        stroke_width_shapes = 1
+        stroke_width_paths = 3
         dot_radius = 0.0
         center = 0 * (RIGHT + UP + OUT)
 
@@ -778,9 +231,7 @@ class Final(ThreeDScene):
         b = 2.0
         c = 2.0
         # Hello
-        t1 = Text("Hello.")
-        self.play(Write(t1))
-        self.play(Unwrite(t1))
+        write_unwrite(self, "Hello.")
         t1 = Tex("Have you ever wondered what is the best way ")
         t2 = Tex("to move from one diagonally opposite corner").next_to(
             t1, direction=DOWN
@@ -800,32 +251,48 @@ class Final(ThreeDScene):
         self.move_camera(50 * DEGREES)
         self.begin_ambient_camera_rotation(camera_speed)
         axes = Axes(x_length=16, y_length=16, x_range=[-16, 16], y_range=[-16, 16])
+        axes.set_color(text_color)
         axes_label = axes.get_axis_labels(x_label="x", y_label="y")
         base = Rectangle(
-            width=a, height=b, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=a,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         top = base.copy().shift(c * OUT)
 
         right = Rectangle(
-            width=c, height=b, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=c,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         right.shift(((c + a) / 2) * RIGHT)
         right.rotate(angle=PI / 2, axis=DOWN, about_point=(a / 2) * RIGHT)
 
         left = Rectangle(
-            width=c, height=b, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=c,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         left.shift((-(c + a) / 2) * RIGHT)
         left.rotate(angle=PI / 2, axis=UP, about_point=(a / 2) * LEFT)
 
         up = Rectangle(
-            width=a, height=c, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=a,
+            height=c,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         up.shift(((c + b) / 2) * UP)
         up.rotate(angle=PI / 2, axis=RIGHT, about_point=(b / 2) * UP)
 
         down = Rectangle(
-            width=a, height=c, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=a,
+            height=c,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         down.shift((-(c + b) / 2) * UP)
         down.rotate(angle=PI / 2, axis=LEFT, about_point=(b / 2) * DOWN)
@@ -848,7 +315,9 @@ class Final(ThreeDScene):
         ]
 
         dotPath = TracedPath(
-            dot.get_center, stroke_color=BLUE, stroke_width=stroke_width_paths
+            dot.get_center,
+            stroke_color=ManimColor.from_hex(blue_bright),
+            stroke_width=stroke_width_paths,
         )
         self.add(dotPath)
         self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
@@ -885,6 +354,7 @@ class Final(ThreeDScene):
 
         brace_d = BraceBetweenPoints(down_left, up_right)
         d_text = brace_d.get_tex("4\\sqrt{2} unit").next_to(brace_d, direction=DOWN)
+        self.wait(1)
 
         self.play(
             FadeOut(
@@ -952,7 +422,9 @@ class Final(ThreeDScene):
         ]
 
         dotPath = TracedPath(
-            dot.get_center, stroke_color=BLUE, stroke_width=stroke_width_paths
+            dot.get_center,
+            stroke_color=ManimColor.from_hex(blue_bright),
+            stroke_width=stroke_width_paths,
         )
         self.add(dotPath)
         self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
@@ -1019,7 +491,9 @@ class Final(ThreeDScene):
         dotpaths = []
         for dot in dotlist:
             dotPath = TracedPath(
-                dot.get_center, stroke_color=BLUE, stroke_width=stroke_width_paths
+                dot.get_center,
+                stroke_color=ManimColor.from_hex(blue_bright),
+                stroke_width=stroke_width_paths,
             )
             dotpaths.append(dotPath)
             self.add(dotPath)
@@ -1071,7 +545,9 @@ class Final(ThreeDScene):
         )
 
         dotPath = TracedPath(
-            start_dot.get_center, stroke_color=BLUE, stroke_width=stroke_width_paths
+            start_dot.get_center,
+            stroke_color=ManimColor.from_hex(blue_bright),
+            stroke_width=stroke_width_paths,
         )
         self.add(dotPath)
         write_unwrite_with_corner_three_d_with_anim(
@@ -1111,7 +587,6 @@ class Final(ThreeDScene):
                 dotPath,
                 axes,
                 axes_label,
-                t1,
             )
         )
         self.move_camera(0, -PI / 2, zoom=1.0)
@@ -1132,34 +607,49 @@ class Final(ThreeDScene):
         self.play(t4.animate.move_to(center))
         self.play(Unwrite(t4))
         write_unwrite(self, "Hmmm, better.")
-        write_unwrite(self, "Lets see this in 3D")
+        write_unwrite(self, "Lets see this in 3D.")
         self.move_camera(PI / 4, -PI / 4)
         self.move_camera(zoom=1)
         base = Rectangle(
-            width=a, height=b, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=a,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         top = base.copy().shift(c * OUT)
 
         right = Rectangle(
-            width=c, height=b, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=c,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         right.shift(((c + a) / 2) * RIGHT)
         right.rotate(angle=PI / 2, axis=DOWN, about_point=(a / 2) * RIGHT)
 
         left = Rectangle(
-            width=c, height=b, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=c,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         left.shift((-(c + a) / 2) * RIGHT)
         left.rotate(angle=PI / 2, axis=UP, about_point=(a / 2) * LEFT)
 
         up = Rectangle(
-            width=a, height=c, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=a,
+            height=c,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         up.shift(((c + b) / 2) * UP)
         up.rotate(angle=PI / 2, axis=RIGHT, about_point=(b / 2) * UP)
 
         down = Rectangle(
-            width=a, height=c, stroke_width=stroke_width_shapes, stroke_color=ORANGE
+            width=a,
+            height=c,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
         )
         down.shift((-(c + b) / 2) * UP)
         down.rotate(angle=PI / 2, axis=LEFT, about_point=(b / 2) * DOWN)
@@ -1178,7 +668,9 @@ class Final(ThreeDScene):
         dot.move_to(dot_position_start)
         self.add(dot)
         dotPath = TracedPath(
-            dot.get_center, stroke_color=BLUE, stroke_width=stroke_width_paths
+            dot.get_center,
+            stroke_color=ManimColor.from_hex(blue_bright),
+            stroke_width=stroke_width_paths,
         )
         self.add(dotPath)
         self.play(AnimationGroup(*fade_ins, lag_ratio=0.1))
@@ -1210,23 +702,48 @@ class Final(ThreeDScene):
         c = 1.2
         self.move_camera(50 * DEGREES)
         self.camera.set_zoom(1.2)
-        base = Rectangle(width=a, height=b, stroke_width=0.5, stroke_color=ORANGE)
+        base = Rectangle(
+            width=a,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
 
         top = base.copy().shift(c * OUT)
 
-        right = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
+        right = Rectangle(
+            width=c,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
         right.shift(((c + a) / 2) * RIGHT)
         right.rotate(angle=90 * DEGREES, axis=DOWN, about_point=(a / 2) * RIGHT)
 
-        left = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
+        left = Rectangle(
+            width=c,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
         left.shift((-(c + a) / 2) * RIGHT)
         left.rotate(angle=90 * DEGREES, axis=UP, about_point=(a / 2) * LEFT)
 
-        up = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
+        up = Rectangle(
+            width=a,
+            height=c,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
         up.shift(((c + b) / 2) * UP)
         up.rotate(angle=90 * DEGREES, axis=RIGHT, about_point=(b / 2) * UP)
 
-        down = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
+        down = Rectangle(
+            width=a,
+            height=c,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
         down.shift((-(c + b) / 2) * UP)
         down.rotate(angle=90 * DEGREES, axis=LEFT, about_point=(b / 2) * DOWN)
         fade_ins = [
@@ -1246,7 +763,9 @@ class Final(ThreeDScene):
         dotpaths = []
         for dot in dotlist:
             dotPath = TracedPath(
-                dot.get_center, stroke_color=BLUE, stroke_width=stroke_width_paths
+                dot.get_center,
+                stroke_color=ManimColor.from_hex(blue_bright),
+                stroke_width=stroke_width_paths,
             )
             dotpaths.append(dotPath)
             self.add(dotPath)
@@ -1335,16 +854,20 @@ class Final(ThreeDScene):
         )
         # down_left_dummy = (-a / 2, (b / 2) - c, 0)
         #
-        # self.add(Dot(up_left_top, color=GREEN))
-        # self.add(Dot(down_left, color=YELLOW))
-        # self.add(Dot(down_right, color=PINK))
+        # self.add(Dot(up_left_top, color=ManimColor.from_hex(green)))
+        # self.add(Dot(down_left, color=ManimColor.from_hex(yellow)))
+        # self.add(Dot(down_right, color=ManimColor.from_hex(magenta)))
         # self.add(Dot(up_right_top))
         X = (b * a) / (c + a)
 
         pass_point = (((-a / 2) + c), X - (b / 2), 0)
         self.play(FadeIn(start_dot, end_dot))
-        self.add(Dot(pass_point, color=BLUE, radius=dot_radius))
-        dotPath = TracedPath(start_dot.get_center, stroke_color=RED)
+        self.add(
+            Dot(pass_point, color=ManimColor.from_hex(blue_bright), radius=dot_radius)
+        )
+        dotPath = TracedPath(
+            start_dot.get_center, stroke_color=ManimColor.from_hex(green_bright)
+        )
         self.add(dotPath)
         self.play(start_dot.animate.move_to(end_dot))
         write_unwrite_three_d(
@@ -1394,15 +917,14 @@ class Final(ThreeDScene):
 
         pass_point = ((a / 2), X - (b / 2), 0)
         pass_point_dot = Dot(pass_point, radius=dot_radius)
-        self.add(pass_point_dot)
-
         start_dot = Dot(down_left, radius=dot_radius)
-        self.add(start_dot)
         end_dot = Dot(top.get_corner(UP + RIGHT), radius=dot_radius)
-        self.add(end_dot)
+        self.play(FadeIn(start_dot, end_dot, pass_point_dot))
 
         write_unwrite_three_d(self, "Now watch carefully how the ant moves.")
-        dotPath1 = TracedPath(start_dot.get_center, stroke_color=RED)
+        dotPath1 = TracedPath(
+            start_dot.get_center, stroke_color=ManimColor.from_hex(cyan_bright)
+        )
         self.add(dotPath1)
         self.play(start_dot.animate.move_to(pass_point))
         self.play(FadeOut(start_dot))
@@ -1414,10 +936,13 @@ class Final(ThreeDScene):
         write_unwrite_three_d_with_anim(
             self,
             text="Let's call this length $l_1$.",
-            animation=AnimationGroup(Indicate(dotPath1), FadeIn(tex1)),
+            animation=Indicate(dotPath1, color=yellow_bright),
         )
+        self.play(FadeIn(tex1))
 
-        dotPath2 = TracedPath(pass_point_dot.get_center, stroke_color=GREEN)
+        dotPath2 = TracedPath(
+            pass_point_dot.get_center, stroke_color=ManimColor.from_hex(green)
+        )
         self.add(dotPath2)
 
         self.play(pass_point_dot.animate.move_to(end_dot))
@@ -1429,20 +954,24 @@ class Final(ThreeDScene):
         write_unwrite_three_d_with_anim(
             self,
             text="And this length $l_2$.",
-            animation=AnimationGroup(FadeIn(tex3), Indicate(dotPath2)),
+            animation=Indicate(dotPath2, color=yellow_bright),
         )
+        self.play(FadeIn(tex3))
 
         write_unwrite_three_d(self, "We have to minimise $l_1+l_2$.")
 
         write_unwrite_three_d(
             self, "Let's find out $l_1$ and $l_2$ in terms of the sides and l."
         )
+        line_stroke_width = 2
         a_line = Line(down_right, down_left)
-        a_line.set_stroke(color=PINK, width=2)
+        a_line.set_stroke(color=ManimColor.from_hex(magenta), width=line_stroke_width)
         x_line = Line(down_right, pass_point)
-        x_line.set_stroke(color=PINK, width=2)
+        x_line.set_stroke(color=ManimColor.from_hex(magenta), width=line_stroke_width)
         l1_line = Line(down_left, pass_point)
-        l1_line.set_stroke(color=BLUE, width=2)
+        l1_line.set_stroke(
+            color=ManimColor.from_hex(blue_bright), width=line_stroke_width
+        )
         self.play(FadeIn(a_line, x_line, l1_line))
 
         tex2 = MathTex("l_1 = \\sqrt{a^2+c^2}")
@@ -1460,11 +989,13 @@ class Final(ThreeDScene):
         pass_point_top = ((a / 2), X - (b / 2), c)
         up_right_top = top.get_corner(UP + RIGHT)
         a_line = Line(pass_point, pass_point_top)
-        a_line.set_stroke(color=PINK, width=2)
+        a_line.set_stroke(color=ManimColor.from_hex(magenta), width=line_stroke_width)
         x_line = Line(pass_point_top, up_right_top)
-        x_line.set_stroke(color=PINK, width=2)
+        x_line.set_stroke(color=ManimColor.from_hex(magenta), width=line_stroke_width)
         l1_line = Line(pass_point, up_right_top)
-        l1_line.set_stroke(color=BLUE, width=2)
+        l1_line.set_stroke(
+            color=ManimColor.from_hex(blue_bright), width=line_stroke_width
+        )
         self.play(FadeIn(a_line, x_line, l1_line))
         tex4 = MathTex("l_2 = \\sqrt{c^2+(b-x)^2}")
         self.add_fixed_in_frame_mobjects(tex4)
@@ -1497,6 +1028,7 @@ class Final(ThreeDScene):
             )
         )
         self.move_camera(0, -PI / 2, zoom=1.0)
+        waittime = 0.5
         t1 = MathTex("l")
         t2 = MathTex("= l_1+l_2")
         t2.next_to(t1)
@@ -1504,29 +1036,39 @@ class Final(ThreeDScene):
         t3.next_to(t2, direction=DOWN)
         t3.shift(RIGHT * 2)
         self.play(Write(t1), Write(t2), (Write(t3)))
+        self.wait(waittime)
         self.play(FadeOut(t2), t1.animate.shift(2.5 * LEFT), t3.animate.move_to(t2))
+        self.wait(waittime)
         self.play(VGroup(t1, t3).animate.shift(2 * DOWN))
+        self.wait(waittime)
         write_unwrite(self, "Now let's differentiate l\\\\ with respect to x.")
         t4 = MathTex("\\frac{dl}{dx}")
         t5 = MathTex("=\\frac{d}{dx}(\\sqrt{a^2+x^2} + \\sqrt{c^2+(b-x)^2})")
         self.play(Transform(t1, t4))
+        self.wait(waittime)
         self.play(t1.animate.shift(4 * LEFT))
 
         self.play(Transform(t3, t5), t1.animate.shift(LEFT))
+        self.wait(waittime)
         t6 = MathTex(
             "= \\frac{d}{dx}(\\sqrt{a^2+x^2})+\\frac{d}{dx}(\\sqrt{c^2+(b-x)^2})"
         )
         self.play(Transform(t3, t6))
+        self.wait(waittime)
         t7 = MathTex(
             "=\\frac{2x}{2\\sqrt{a^2+x^2}} - \\frac{2(b-x)}{2\\sqrt{c^2+(b-x)^2}}"
         )
 
         self.play(Transform(t3, t7), t1.animate.shift(RIGHT))
+        self.wait(waittime)
         self.play(VGroup(t3, t1).animate.shift(DOWN))
+        self.wait(waittime)
         write_unwrite(self, "Now, to find the minimum we set the derivative to zero.")
 
         self.play(VGroup(t3, t1).animate.shift(UP))
+        self.wait(waittime)
         self.play(FadeOut(t1), t3.animate.shift(LEFT))
+        self.wait(waittime)
         self.play(
             Transform(
                 t3,
@@ -1535,7 +1077,6 @@ class Final(ThreeDScene):
                 ),
             )
         )
-        waittime = 0.5
         self.wait(waittime)
         self.play(
             Transform(
@@ -1665,23 +1206,48 @@ class Final(ThreeDScene):
         write_unwrite(self, "Let's verify this geometrically.")
         self.move_camera(PI / 4, -PI / 4)
         self.move_camera(zoom=1)
-        base = Rectangle(width=a, height=b, stroke_width=0.5, stroke_color=ORANGE)
+        base = Rectangle(
+            width=a,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
 
         top = base.copy().shift(c * OUT)
 
-        right = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
+        right = Rectangle(
+            width=c,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
         right.shift(((c + a) / 2) * RIGHT)
         right.rotate(angle=90 * DEGREES, axis=DOWN, about_point=(a / 2) * RIGHT)
 
-        left = Rectangle(width=c, height=b, stroke_width=0.5, stroke_color=ORANGE)
+        left = Rectangle(
+            width=c,
+            height=b,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
         left.shift((-(c + a) / 2) * RIGHT)
         left.rotate(angle=90 * DEGREES, axis=UP, about_point=(a / 2) * LEFT)
 
-        up = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
+        up = Rectangle(
+            width=a,
+            height=c,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
         up.shift(((c + b) / 2) * UP)
         up.rotate(angle=90 * DEGREES, axis=RIGHT, about_point=(b / 2) * UP)
 
-        down = Rectangle(width=a, height=c, stroke_width=0.5, stroke_color=ORANGE)
+        down = Rectangle(
+            width=a,
+            height=c,
+            stroke_width=stroke_width_shapes,
+            stroke_color=ManimColor.from_hex(red),
+        )
         down.shift((-(c + b) / 2) * UP)
         down.rotate(angle=90 * DEGREES, axis=LEFT, about_point=(b / 2) * DOWN)
         fade_ins = [
@@ -1723,17 +1289,19 @@ class Final(ThreeDScene):
         down_left_dummy = (-a / 2, (b / 2) - c, 0)
 
         X = (b * a) / (c + a)
-        # self.add(Dot(up_left_top, color=GREEN))
-        # self.add(Dot(down_left, color=YELLOW))
-        # self.add(Dot(down_right, color=PINK))
-        # self.add(Dot(down_right, color=PINK).copy().shift(UP * X).set_color(BLUE))
+        # self.add(Dot(up_left_top, color=ManimColor.from_hex(green)))
+        # self.add(Dot(down_left, color=ManimColor.from_hex(yellow)))
+        # self.add(Dot(down_right, color=ManimColor.from_hex(magenta)))
+        # self.add(Dot(down_right, color=ManimColor.from_hex(magenta)).copy().shift(UP * X).set_color(ManimColor.from_hex(blue_bright)))
         # self.add(Dot(up_right_top))
 
         pass_point = (((-a / 2) + c), X - (b / 2), 0)
 
         self.play(FadeIn(start_dot, end_dot))
-        # self.add(Dot(pass_point, color=BLUE, radius=dot_radius))
-        dotPath = TracedPath(start_dot.get_center, stroke_color=RED)
+        # self.add(Dot(pass_point, color=ManimColor.from_hex(blue_bright), radius=dot_radius))
+        dotPath = TracedPath(
+            start_dot.get_center, stroke_color=ManimColor.from_hex(red_bright)
+        )
         self.add(dotPath)
 
         write_unwrite_three_d(self, "Let's keep only the relevant parts.")
@@ -1803,7 +1371,7 @@ class Final(ThreeDScene):
             self, "We can identify two similar triangles."
         )
         small_triangle_stroke_width = 3
-        small_trianlge_color = PINK
+        small_trianlge_color = ManimColor.from_hex(magenta)
         line1s = Line(point_a, point_b)
         line1s.set_stroke(width=small_triangle_stroke_width, color=small_trianlge_color)
         line2s = Line(point_b, point_c)
@@ -1816,7 +1384,7 @@ class Final(ThreeDScene):
         self.play(small_triangle.animate.shift((10 * LEFT + 3 * UP) * 0.5))
 
         large_triangle_stroke_width = 3
-        large_triangle_color = BLUE
+        large_triangle_color = ManimColor.from_hex(blue_bright)
         line1b = Line(point_a, point_e)
         line1b.set_stroke(width=large_triangle_stroke_width, color=large_triangle_color)
         line2b = Line(point_e, point_d)
