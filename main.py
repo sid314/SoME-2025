@@ -850,12 +850,6 @@ class Final(ThreeDScene):
             Transform(brace_c, brace_f),
             Transform(c_text, f_text),
         )
-        # down_left_dummy = (-a / 2, (b / 2) - c, 0)
-        #
-        # self.add(Dot(up_left_top, color=ManimColor.from_hex(green)))
-        # self.add(Dot(down_left, color=ManimColor.from_hex(yellow)))
-        # self.add(Dot(down_right, color=ManimColor.from_hex(magenta)))
-        # self.add(Dot(up_right_top))
         X = (b * a) / (c + a)
 
         pass_point = (((-a / 2) + c), X - (b / 2), 0)
@@ -1276,24 +1270,16 @@ class Final(ThreeDScene):
         down_left = base.get_corner(DOWN + LEFT)
         down_right = base.get_corner(DOWN + RIGHT)
         down_left_top = top.get_corner(DOWN + LEFT)
-        # start_dot = Dot(down_left, radius=dot_radius)
-        # end_dot = Dot(up_left_top, radius=dot_radius)
 
         start_dot = Dot(down_left, radius=0)
         end_dot = Dot(up_left_top, radius=0)
         down_left_dummy = (-a / 2, (b / 2) - c, 0)
 
         X = (b * a) / (c + a)
-        # self.add(Dot(up_left_top, color=ManimColor.from_hex(green)))
-        # self.add(Dot(down_left, color=ManimColor.from_hex(yellow)))
-        # self.add(Dot(down_right, color=ManimColor.from_hex(magenta)))
-        # self.add(Dot(down_right, color=ManimColor.from_hex(magenta)).copy().shift(UP * X).set_color(ManimColor.from_hex(blue_bright)))
-        # self.add(Dot(up_right_top))
 
         pass_point = (((-a / 2) + c), X - (b / 2), 0)
 
         self.play(FadeIn(start_dot, end_dot))
-        # self.add(Dot(pass_point, color=ManimColor.from_hex(blue_bright), radius=dot_radius))
         dotPath = TracedPath(
             start_dot.get_center, stroke_color=ManimColor.from_hex(red_bright)
         )
